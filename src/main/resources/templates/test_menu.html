@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thyneleaf">
+<head>
+    <meta charset="UTF-8">
+    <title>ОКО САУРОНА - клиент</title>
+</head>
+<body>
+<form th:object="${client}" action="#" th:action="@{/test_proc}" method="post">
+    <p>Действие:</p>
+    <p><input name="_method" type="radio" value="GET" checked>Получить</p>
+    <p><input name="_method" type="radio" value="POST">Создать</p>
+    <p><input name="_method" type="radio" value="PUT">Обновить</p>
+    <p><input name="_method" type="radio" value="DELETE">Удалить</p>
+    <p>id: <input type="number" th:field="*{id}"/></p>
+    <p>ФИО: <input type="text" th:field="*{fullName}"/></p>
+    <p>тип: <input type="text" th:field="*{type}"/></p>
+    <input type="submit" >
+</form>
+<script>
+
+
+</script>
+</body>
+</html>
