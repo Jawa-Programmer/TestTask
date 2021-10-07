@@ -19,12 +19,12 @@ public class ContractsService {
         return contractsRepository.findAll();
     }
 
-    public Contract getContract(long id) {
+    public Contract get(long id) {
         return contractsRepository.findById(id).orElse(null);
     }
 
-    public void save(Contract c) {
-        contractsRepository.save(c);
+    public Contract save(Contract c) {
+        return contractsRepository.save(c);
     }
 
     public void delete(long id) {

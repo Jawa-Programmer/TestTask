@@ -19,12 +19,12 @@ public class PhoneNumbersService {
         return phoneNumbersRepository.findAll();
     }
 
-    public PhoneNumber getClient(long id) {
+    public PhoneNumber get(long id) {
         return phoneNumbersRepository.findById(id).orElse(null);
     }
 
-    public void save(PhoneNumber num) {
-        phoneNumbersRepository.save(num);
+    public PhoneNumber save(PhoneNumber num) {
+        return phoneNumbersRepository.save(num);
     }
 
     public void delete(long id) {

@@ -1,5 +1,6 @@
 package ru.jawaprog.test_task.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -19,7 +20,7 @@ public class Account {
 
     @Getter
     @Setter
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
@@ -28,9 +29,10 @@ public class Account {
     @Column(nullable = false)
     private int number;
 
+    @JsonIgnore // что бы не возникало рекурсии. В будущем можно сделать свой JSON сериализатор
     @Getter
     @Setter
-    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Collection<PhoneNumber> phoneNumbers;
 
 }

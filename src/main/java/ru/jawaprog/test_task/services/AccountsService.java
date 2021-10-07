@@ -19,12 +19,12 @@ public class AccountsService {
         return accountsRepository.findAll();
     }
 
-    public Account getClient(long id) {
+    public Account get(long id) {
         return accountsRepository.findById(id).orElse(null);
     }
 
-    public void save(Account acc) {
-        accountsRepository.save(acc);
+    public Account save(Account acc) {
+        return accountsRepository.save(acc);
     }
 
     public void delete(long id) {

@@ -23,7 +23,7 @@ public class PhoneNumber {
 
     @Getter
     @Setter
-    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "account_id")
     private Account account;
 

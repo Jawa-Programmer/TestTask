@@ -1,5 +1,6 @@
 package ru.jawaprog.test_task.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,9 +32,10 @@ public class Client {
     @Enumerated(EnumType.ORDINAL)
     private ClientType type;
 
+    @JsonIgnore // что бы не возникало рекурсии. В будущем можно сделать свой JSON сериализатор
     @Getter
     @Setter
-    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Collection<Contract> contracts;
 
 }
