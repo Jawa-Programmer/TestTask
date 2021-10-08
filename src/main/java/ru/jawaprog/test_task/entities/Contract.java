@@ -26,8 +26,8 @@ public class Contract {
 
     @Getter
     @Setter
-    @Column(nullable = false, name = "contract_number")
-    private long contractNumber;
+    @Column(nullable = false, name = "number")
+    private long number;
 
     @JsonIgnore // что бы не возникало рекурсии. В будущем можно сделать свой JSON сериализатор
     @Getter

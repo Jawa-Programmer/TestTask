@@ -2,8 +2,8 @@ package ru.jawaprog.test_task.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.jawaprog.test_task.entities.Client;
 import ru.jawaprog.test_task.services.ClientsService;
 
@@ -16,45 +16,49 @@ public class ClientsController {
     private ClientsService clientsService;
 
     @GetMapping(path = "/{id}")
-    public Client getClient(@PathVariable long id) {
-        return clientsService.get(id);
+    public ResponseEntity<Client> getClient(@PathVariable long id) {
+        Client c = clientsService.get(id);
+        if (c == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
     @GetMapping
-    public List<Client> getClients() {
-        return clientsService.findAll();
+    public ResponseEntity<List<Client>> getClients() {
+        return new ResponseEntity<>(clientsService.findAll(), HttpStatus.OK);
     }
 
     @PostMapping
-    public Client postClient(@RequestParam(value = "full_name") String fullName,
-                             @RequestParam(value = "type") Client.ClientType type) {
+    public ResponseEntity<Client> postClient(@RequestParam(value = "fullName") String fullName,
+                                             @RequestParam(value = "type") Client.ClientType type) {
         Client client = new Client();
         client.setFullName(fullName);
         client.setType(type);
-        return clientsService.save(client);
+        return new ResponseEntity<>(clientsService.save(client), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public Client postClient(@PathVariable long id,
-                             @RequestParam(value = "full_name", required = false) String fullName,
-                             @RequestParam(value = "type", required = false) Client.ClientType type) {
+    public ResponseEntity<Client> postClient(@PathVariable long id,
+                                             @RequestParam(value = "fullName", required = false) String fullName,
+                                             @RequestParam(value = "type", required = false) Client.ClientType type) {
         Client client = clientsService.get(id);
         if (client == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client with id " + id + " Not Found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         if (fullName != null)
             client.setFullName(fullName);
         if (type != null)
             client.setType(type);
-        return clientsService.save(client);
+        return new ResponseEntity<>(clientsService.save(client), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void postClient(@PathVariable long id) {
+    public ResponseEntity deleteClient(@PathVariable long id) {
         try {
             clientsService.delete(id);
-            throw new ResponseStatusException(HttpStatus.OK, "Client with id " + id + " was deleted");
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Client with id " + id + " Not Found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

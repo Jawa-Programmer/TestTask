@@ -2,6 +2,7 @@ package ru.jawaprog.test_task.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.jawaprog.test_task.entities.Account;
@@ -20,53 +21,57 @@ public class PhoneNumbersController {
     private AccountsService accountsService;
 
     @GetMapping(path = "/{id}")
-    public PhoneNumber getPhoneNumber(@PathVariable long id) {
-        return phoneNumbersService.get(id);
+    public ResponseEntity<PhoneNumber> getPhoneNumber(@PathVariable long id) {
+        PhoneNumber phoneNumber = phoneNumbersService.get(id);
+        if (phoneNumber == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
     }
 
     @GetMapping
-    public List<PhoneNumber> getPhoneNumbers() {
-        return phoneNumbersService.findAll();
+    public ResponseEntity<List<PhoneNumber>> getPhoneNumbers() {
+        return new ResponseEntity<>(phoneNumbersService.findAll(), HttpStatus.OK);
     }
 
     @PostMapping
-    public PhoneNumber postPhoneNumber(@RequestParam(value = "number") String number,
-                                       @RequestParam(value = "account_id") long accountId) {
+    public ResponseEntity<PhoneNumber> postPhoneNumber(@RequestParam(value = "number") String number,
+                                                       @RequestParam(value = "accountId") long accountId) {
         Account account = accountsService.get(accountId);
         if (account == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with id " + account + " Not Found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         PhoneNumber phoneNumber = new PhoneNumber();
         phoneNumber.setAccount(account);
         phoneNumber.setNumber(number);
-        return phoneNumbersService.save(phoneNumber);
+        return new ResponseEntity<>(phoneNumbersService.save(phoneNumber), HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{id}")
-    public PhoneNumber putPhoneNumber(@PathVariable long id,
-                                       @RequestParam(value = "number", required = false) String number,
-                                       @RequestParam(value = "account_id", required = false) Long accountId) {
+    public ResponseEntity<PhoneNumber> putPhoneNumber(@PathVariable long id,
+                                                      @RequestParam(value = "number", required = false) String number,
+                                                      @RequestParam(value = "accountId", required = false) Long accountId) {
         PhoneNumber phoneNumber = phoneNumbersService.get(id);
         if (phoneNumber == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Phone number with id " + id + " Not Found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if (accountId != null) {
             Account account = accountsService.get(accountId);
             if (account == null)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with id " + accountId + " Not Found");
+                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
             phoneNumber.setAccount(account);
         }
         if (number != null)
             phoneNumber.setNumber(number);
-        return phoneNumbersService.save(phoneNumber);
+        return new ResponseEntity<>(phoneNumbersService.save(phoneNumber), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void deletePhoneNumber(@PathVariable long id) {
+    public ResponseEntity deletePhoneNumber(@PathVariable long id) {
         try {
             phoneNumbersService.delete(id);
-            throw new ResponseStatusException(HttpStatus.OK, "Phone number with id " + id + " was deleted");
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Phone number with id " + id + " Not Found");
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 }

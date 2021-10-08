@@ -2,6 +2,7 @@ package ru.jawaprog.test_task.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.jawaprog.test_task.entities.Account;
@@ -22,52 +23,56 @@ public class AccountController {
     private ContractsService contractsService;
 
     @GetMapping(path = "/{id}")
-    public Account getAccount(@PathVariable long id) {
-        return accountsService.get(id);
+    public ResponseEntity<Account> getAccount(@PathVariable long id) {
+        Account acc = accountsService.get(id);
+        if (acc == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(acc, HttpStatus.OK);
     }
 
     @GetMapping
-    public List<Account> getAccounts() {
-        return accountsService.findAll();
+    public ResponseEntity<List<Account>> getAccounts() {
+        return new ResponseEntity<>(accountsService.findAll(), HttpStatus.OK);
     }
 
     @PostMapping
-    public Account postAccount(@RequestParam(value = "number") int number,
-                               @RequestParam(value = "contract_id") long contractId) {
+    public ResponseEntity<Account> postAccount(@RequestParam(value = "number") int number,
+                                               @RequestParam(value = "contractId") long contractId) {
         Contract contract = contractsService.get(contractId);
         if (contract == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Contract with id " + contractId + " Not Found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Account account = new Account();
         account.setContract(contract);
         account.setNumber(number);
-        return accountsService.save(account);
+        return new ResponseEntity<>(accountsService.save(account), HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{id}")
-    public Account putAccount(@PathVariable long id,
-                              @RequestParam(value = "number", required = false) Integer number,
-                              @RequestParam(value = "contract_id", required = false) Long contractId) {
+    public ResponseEntity<Account> putAccount(@PathVariable long id,
+                                              @RequestParam(value = "number", required = false) Integer number,
+                                              @RequestParam(value = "contractId", required = false) Long contractId) {
         Account account = accountsService.get(id);
         if (account == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with id " + id + " Not Found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         if (contractId != null) {
             Contract contract = contractsService.get(contractId);
             if (contract == null)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Contract with id " + contractId + " Not Found");
+                return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
             account.setContract(contract);
         }
         if (number != null)
             account.setNumber(number);
-        return accountsService.save(account);
+        return new ResponseEntity<>(accountsService.save(account), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void deleteAccount(@PathVariable long id) {
+    public ResponseEntity deleteAccount(@PathVariable long id) {
         try {
             accountsService.delete(id);
-            throw new ResponseStatusException(HttpStatus.OK, "Account with id " + id + " was deleted");
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account with id " + id + " Not Found");
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
 }
