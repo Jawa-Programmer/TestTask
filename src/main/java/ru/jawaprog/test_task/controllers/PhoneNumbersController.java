@@ -39,7 +39,7 @@ public class PhoneNumbersController {
                                                        @RequestParam(value = "accountId") long accountId) {
         Account account = accountsService.get(accountId);
         if (account == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         PhoneNumber phoneNumber = new PhoneNumber();
         phoneNumber.setAccount(account);
         phoneNumber.setNumber(number);

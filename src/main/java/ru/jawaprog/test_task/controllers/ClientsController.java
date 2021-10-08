@@ -24,6 +24,7 @@ public class ClientsController {
             return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
+
     @GetMapping
     public ResponseEntity<List<Client>> getClients() {
         return new ResponseEntity<>(clientsService.findAll(), HttpStatus.OK);

@@ -41,7 +41,7 @@ public class AccountController {
                                                @RequestParam(value = "contractId") long contractId) {
         Contract contract = contractsService.get(contractId);
         if (contract == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         Account account = new Account();
         account.setContract(contract);
         account.setNumber(number);

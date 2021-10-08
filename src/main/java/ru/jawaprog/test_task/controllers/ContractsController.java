@@ -40,7 +40,7 @@ public class ContractsController {
                                                  @RequestParam(value = "clientId") long clientId) {
         Client client = clientsService.get(clientId);
         if (client == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         Contract contract = new Contract();
         contract.setNumber(contractNumber);
         contract.setClient(client);
