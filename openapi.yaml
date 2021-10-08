@@ -1,0 +1,245 @@
+openapi: 3.0.2
+info:
+  title: МТС Клиенты API
+  description: Позволяет взаимодействовать с базой данных клиентов МТС
+  version: '1.0'
+servers:
+  - url: http://localhost:8080/
+    variables: {}
+    description: Тестовый сервер
+paths:
+  /clients:
+    get:
+      summary: "Возвращает список всех клиентов"
+      responses:
+        200:
+          description: "Успешный запрос"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/client"
+    post:
+      summary: "Добавляет нового клиента в базу данных"
+      parameters:
+        - name: fullName
+          in: query
+          required: true
+          description: "ФИО человека или наименование юридического лица"
+          example: "Зубенко Михаил Петрович"
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: true
+          description: "Тип клиента: INDIVIDUAL - физическое лицо, ENTITY - юридическое лицо"
+          schema:
+            type: string
+            enum: [INDIVIDUAL, ENTITY]
+      responses:
+        202:
+          description: "Ресурс создан. В теле передается созданный объект клиента"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/client"
+        400:
+          description: "Неверный запрос. Один из параметров пропущен или задан неверно"
+  /clients/{id}:
+    get:
+      summary: "возвращает пользователя по его id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается объект клиента"
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/client"
+        404:
+          description: "Клиент с заданным id не найден"
+    put:
+      summary: "изменяет пользователя с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: fullName
+          in: query
+          required: false
+          description: "ФИО человека или наименование юридического лица"
+          example: "Зубенко Михаил Петрович"
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          description: "Тип клиента: INDIVIDUAL - физическое лицо, ENTITY - юридическое лицо"
+          schema:
+            type: string
+            enum: [INDIVIDUAL, ENTITY]
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается объект клиента"
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/client"
+        404:
+          description: "Клиент с заданным id не найден"
+    delete:
+      summary: "удаляет клиента с указанным id. Все контракты данного клиента так же удаляются"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        202:
+          description: "Удаление прошло успешно"
+        404:
+          description: "Клиент с заданным id не найден"
+            
+  /contracts:
+    get:
+      summary: "Возвращает список всех контрактов"
+      responses:
+        200:
+          description: "Успешный запрос"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/contract"
+    post:
+      summary: "Добавляет новый контракт в базу данных"
+      parameters:
+        - name: number
+          in: query
+          required: true
+          description: "Номер контракта"
+          example: 8805553535
+          schema:
+            type: integer
+        - name: clientId
+          in: query
+          required: true
+          description: "ID клиента. Важно, что бы клиент с указанным ID был в базе данных"
+          schema:
+            type: integer
+      responses:
+        202:
+          description: "Ресурс создан. В теле передается созданный объект контракта"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/contract"
+        400:
+          description: "Неверный запрос. Один из параметров пропущен или задан неверно"
+        422:
+          description: "Запрос синтаксически верный, однако пользователя с указанным clientId нет в БД"
+  /contracts/{id}:
+    get:
+      summary: "возвращает контракт по его id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается объект контракта"
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/contract"
+        404:
+          description: "Контракт с заданным id не найден"
+    put:
+      summary: "изменяет контракт с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: number
+          in: query
+          required: false
+          description: "Номер контракта"
+          example: 8805553535
+          schema:
+            type: integer
+        - name: clientId
+          in: query
+          required: false
+          description: "ID клиента. Важно, что бы клиент с указанным ID был в базе данных"
+          schema:
+            type: integer
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается объект контракта"
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/contract"
+        404:
+          description: "Контракт с заданным id не найден"
+        422:
+          description: "Запрос синтаксически верный, однако контракта с указанным clientId нет в БД"
+    delete:
+      summary: "Удаляет контракт с указанным id, а так же все лицевые счета, открытые по данному контракту"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        202:
+          description: "Удаление прошло успешно"
+        404:
+          description: "Контракт с заданным id не найден"
+components:
+  schemas:
+    client:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fullName:
+          type: string
+          example: "Зубенко Михаил Петрович"
+        type:
+          type: string
+          enum: [INDIVIDUAL, ENTITY]
+    contract:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          example: 8805553535
+        client:
+          $ref : "#/components/schemas/client"
+    
