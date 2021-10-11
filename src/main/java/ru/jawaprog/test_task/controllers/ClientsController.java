@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.jawaprog.test_task.entities.Account;
 import ru.jawaprog.test_task.entities.Client;
+import ru.jawaprog.test_task.entities.Contract;
+import ru.jawaprog.test_task.entities.PhoneNumber;
 import ru.jawaprog.test_task.services.ClientsService;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("clients")
@@ -22,6 +25,35 @@ public class ClientsController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else
             return new ResponseEntity<>(c, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/{id}/contracts")
+    public ResponseEntity<Collection<Contract>> getClientsContracts(@PathVariable long id) {
+        Client c = clientsService.get(id);
+        if (c == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else
+            return new ResponseEntity<>(c.getContracts(), HttpStatus.OK);
+    }
+
+
+    @GetMapping(path = "/{id}/phones")
+    public ResponseEntity<Collection<PhoneNumber>> getClientsPhones(@PathVariable long id) {
+        Client c = clientsService.get(id);
+        if (c == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else {
+            Set<PhoneNumber> phones = new HashSet<>();
+            for (Contract contract : c.getContracts())
+                for (Account account : contract.getAccounts())
+                    phones.addAll(account.getPhoneNumbers());
+            return new ResponseEntity<>(phones, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(path = "/findByName/{name}")
+    public ResponseEntity<List<Client>> findClients(@PathVariable String name) {
+        return new ResponseEntity<>(clientsService.findByName(name), HttpStatus.OK);
     }
 
 

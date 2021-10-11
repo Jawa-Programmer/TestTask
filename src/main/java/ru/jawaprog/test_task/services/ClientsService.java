@@ -33,4 +33,8 @@ public class ClientsService {
         clientsRepository.deleteById(id);
     }
 
+    public List<Client> findByName(String name)
+    {
+        return clientsRepository.findAllByName(name);
+    }
 }

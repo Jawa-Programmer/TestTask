@@ -111,7 +111,67 @@ paths:
           description: "Удаление прошло успешно"
         404:
           description: "Клиент с заданным id не найден"
-            
+  /clients/{id}/contracts:
+    get:
+      summary: "возвращает список контрактов пользователя с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле массив объектов контрактов"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/contract"
+        404:
+          description: "Клиент с заданным id не найден"
+  /clients/{id}/phones:
+    get:
+      summary: "возвращает список номеров телефонов пользователя с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле массив объектов номеров телефонов"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/phoneNumber"
+        404:
+          description: "Клиент с заданным id не найден"
+  /clients/findByName/{name}:
+    get:
+      summary: "Возвращает список клиентов, в имени которых содержится строка name (без учета регистра)"
+      parameters:
+        - name: name
+          in: path
+          required: true
+          example: "Зубенко"
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Успешный запрос"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/client"
   /contracts:
     get:
       summary: "Возвращает список всех контрактов"
@@ -202,7 +262,7 @@ paths:
         404:
           description: "Контракт с заданным id не найден"
         422:
-          description: "Запрос синтаксически верный, однако контракта с указанным clientId нет в БД"
+          description: "Запрос синтаксически верный, однако клиента с указанным clientId нет в БД"
     delete:
       summary: "Удаляет контракт с указанным id, а так же все лицевые счета, открытые по данному контракту"
       parameters:
@@ -217,6 +277,259 @@ paths:
           description: "Удаление прошло успешно"
         404:
           description: "Контракт с заданным id не найден"
+  /contracts/{id}/accounts:
+    get:
+      summary: "возвращает список счетов, открытых по контракту с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле массив объектов счетов"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/account"
+        404:
+          description: "Контракт с заданным id не найден"
+  /accounts:
+    get:
+      summary: "Возвращает список всех лицевых счетов"
+      responses:
+        200:
+          description: "Успешный запрос"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/account"
+    post:
+      summary: "Добавляет новый лицевой счет в базу данных"
+      parameters:
+        - name: number
+          in: query
+          required: true
+          description: "Номер счета"
+          example: 8805553535
+          schema:
+            type: integer
+        - name: contractId
+          in: query
+          required: true
+          description: "ID контракта. Важно, что бы контракт с указанным ID был в базе данных"
+          schema:
+            type: integer
+      responses:
+        202:
+          description: "Ресурс создан. В теле передается созданный объект счета"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account"
+        400:
+          description: "Неверный запрос. Один из параметров пропущен или задан неверно"
+        422:
+          description: "Запрос синтаксически верный, однако контракта с указанным contractId нет в БД"
+  /accounts/{id}:
+    get:
+      summary: "возвращает счёт по его id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается объект счёта"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account"
+        404:
+          description: "Счёт с заданным id не найден"
+    put:
+      summary: "Изменяет счёт с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: number
+          in: query
+          required: false
+          description: "Номер счета"
+          example: 880223521
+          schema:
+            type: integer
+        - name: clientId
+          in: query
+          required: false
+          description: "ID контракта. Важно, что бы контракт с указанным ID был в базе данных"
+          schema:
+            type: integer
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается обновленный объект счёта"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account"
+        404:
+          description: "Счёт с заданным id не найден"
+        422:
+          description: "Запрос синтаксически верный, однако контракта с указанным contractId нет в БД"
+    delete:
+      summary: "Удаляет счёт с указанным id, а так же все номера телефонов, связанные с ним"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        202:
+          description: "Удаление прошло успешно"
+        404:
+          description: "Контракт с заданным id не найден"
+  /accounts/{id}/phones:
+    get:
+      summary: "возвращает список номеров телефонов, привязанных к счёту с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле массив объектов номеров телефонов"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/phoneNumber"
+        404:
+          description: "Счёт с заданным id не найден"
+  /phone-numbers:
+    get:
+      summary: "Возвращает список всех номеров телефонов"
+      responses:
+        200:
+          description: "Успешный запрос"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/phoneNumber"
+    post:
+      summary: "Добавляет новый номер телефона в базу данных"
+      parameters:
+        - name: number
+          in: query
+          required: true
+          description: "Номер телефона"
+          example: "8 (800) 555 35-35"
+          schema:
+            type: string
+        - name: accountId
+          in: query
+          required: true
+          description: "ID лицевого счета. Важно, что бы счет с указанным ID был в базе данных"
+          schema:
+            type: integer
+      responses:
+        202:
+          description: "Ресурс создан. В теле передается созданный объект номера телефона"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/phoneNumber"
+        400:
+          description: "Неверный запрос. Один из параметров пропущен или задан неверно"
+        422:
+          description: "Запрос синтаксически верный, однако лицевого счёта с указанным accountId нет в БД"
+  /phone-numbers/{id}:
+    get:
+      summary: "возвращает номер телефона по его id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается объект номера телефона"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/phoneNumber"
+        404:
+          description: "Номер телефона с заданным id не найден"
+    put:
+      summary: "Изменяет номер телефона с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: number
+          in: query
+          required: false
+          description: "Номер телефона"
+          example: "+7 (999) 8888-77-66"
+          schema:
+            type: string
+        - name: clientId
+          in: query
+          required: false
+          description: "ID лицевого счёта. Важно, что бы счёт с указанным ID был в базе данных"
+          schema:
+            type: integer
+      responses:
+        200:
+          description: "Успешный запрос. В теле передается обновленный объект номера телефона"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/phoneNumber"
+        404:
+          description: "Номер телефона с заданным id не найден"
+        422:
+          description: "Запрос синтаксически верный, однако контракта с указанным contractId нет в БД"
+    delete:
+      summary: "Удаляет номер телефона с указанным id"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        202:
+          description: "Удаление прошло успешно"
+        404:
+          description: "Телефон с заданным id не найден"
+
 components:
   schemas:
     client:
@@ -242,4 +555,25 @@ components:
           example: 8805553535
         client:
           $ref : "#/components/schemas/client"
-    
+    account:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          example: 8805553535
+        contract:
+          $ref : "#/components/schemas/contract"
+    phoneNumber:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: string
+          example: "8 (800) 555-35-35"
+        contract:
+          $ref: "#/components/schemas/account"
