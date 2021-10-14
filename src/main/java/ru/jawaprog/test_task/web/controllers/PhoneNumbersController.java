@@ -1,15 +1,5 @@
 package ru.jawaprog.test_task.web.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.jawaprog.test_task.dao.entities.AccountADO;
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDAO;
-import ru.jawaprog.test_task.dao.services.AccountsService;
-import ru.jawaprog.test_task.dao.services.PhoneNumbersService;
-
-import java.util.List;
 /*
 @RestController
 @RequestMapping("phone-numbers")

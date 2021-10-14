@@ -1,18 +1,10 @@
 package ru.jawaprog.test_task.web.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.jawaprog.test_task.dao.entities.AccountADO;
-import ru.jawaprog.test_task.dao.entities.ContractDAO;
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDAO;
-import ru.jawaprog.test_task.dao.services.AccountsService;
-import ru.jawaprog.test_task.dao.services.ContractsService;
 
-import java.util.Collection;
-import java.util.List;
-/*
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("accounts")
 public class AccountController {
@@ -85,4 +77,3 @@ public class AccountController {
         }
     }
 }
-*/

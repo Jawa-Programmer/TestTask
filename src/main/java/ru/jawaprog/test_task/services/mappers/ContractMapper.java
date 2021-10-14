@@ -1,16 +1,13 @@
-package ru.jawaprog.test_task.mappers;
+package ru.jawaprog.test_task.services.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
-import ru.jawaprog.test_task.dao.entities.ClientDAO;
 import ru.jawaprog.test_task.dao.entities.ContractDAO;
-import ru.jawaprog.test_task.web.entities.ClientDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
 import java.util.Collection;
-import java.util.List;
 
 @Mapper
 public interface ContractMapper {

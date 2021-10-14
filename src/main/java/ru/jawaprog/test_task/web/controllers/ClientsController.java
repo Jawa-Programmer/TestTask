@@ -4,11 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.jawaprog.test_task.dao.entities.AccountADO;
-import ru.jawaprog.test_task.dao.entities.ClientDAO;
-import ru.jawaprog.test_task.dao.entities.ContractDAO;
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDAO;
-import ru.jawaprog.test_task.dao.services.ClientsService;
+import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.web.entities.ClientDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
@@ -55,13 +51,13 @@ public class ClientsController {
 */
 
     @GetMapping(path = "/findByName/{name}")
-    public ResponseEntity<List<ClientDTO>> findClients(@PathVariable String name) {
+    public ResponseEntity<Collection<ClientDTO>> findClients(@PathVariable String name) {
         return new ResponseEntity<>(clientsService.findByName(name), HttpStatus.OK);
     }
 
 
     @GetMapping
-    public ResponseEntity<List<ClientDTO>> getClients() {
+    public ResponseEntity<Collection<ClientDTO>> getClients() {
         return new ResponseEntity<>(clientsService.findAll(), HttpStatus.OK);
     }
 

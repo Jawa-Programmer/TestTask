@@ -1,16 +1,15 @@
-package ru.jawaprog.test_task.dao.services;
+package ru.jawaprog.test_task.services;
 
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDAO;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
-import ru.jawaprog.test_task.mappers.ClientMapper;
-import ru.jawaprog.test_task.mappers.ContractMapper;
+import ru.jawaprog.test_task.services.mappers.ClientMapper;
+import ru.jawaprog.test_task.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.entities.ClientDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class ClientsService {
@@ -21,7 +20,7 @@ public class ClientsService {
         this.clientsRepository = clientsRepository;
     }
 
-    public List<ClientDTO> findAll() {
+    public Collection<ClientDTO> findAll() {
         return ClientMapper.INSTANCE.toDto(clientsRepository.findAll());
     }
 
@@ -62,7 +61,7 @@ public class ClientsService {
         clientsRepository.deleteById(id);
     }
 
-    public List<ClientDTO> findByName(String name) {
+    public Collection<ClientDTO> findByName(String name) {
         return ClientMapper.INSTANCE.toDto(clientsRepository.findAllByName(name));
     }
 }

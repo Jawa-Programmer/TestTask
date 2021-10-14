@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "accounts")
-public class AccountADO {
+public class AccountDAO {
     @Getter
     @Setter
     @Id
@@ -27,7 +27,7 @@ public class AccountADO {
     @Getter
     @Setter
     @Column(nullable = false)
-    private int number;
+    private long number;
 
     @Getter
     @Setter

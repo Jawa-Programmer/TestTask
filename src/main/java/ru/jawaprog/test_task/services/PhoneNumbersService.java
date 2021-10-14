@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.dao.services;
+package ru.jawaprog.test_task.services;
 
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDAO;

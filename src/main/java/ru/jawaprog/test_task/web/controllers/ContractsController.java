@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.jawaprog.test_task.dao.entities.ContractDAO;
-import ru.jawaprog.test_task.dao.services.ClientsService;
-import ru.jawaprog.test_task.dao.services.ContractsService;
+import ru.jawaprog.test_task.services.ClientsService;
+import ru.jawaprog.test_task.services.ContractsService;
 import ru.jawaprog.test_task.web.entities.ClientDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
@@ -55,9 +54,10 @@ public class ContractsController {
         ContractDTO contract = new ContractDTO();
         contract.setNumber(contractNumber);
         contract.setClient(client);
-        try {
-            return new ResponseEntity<>(contractsService.saveNew(contract), HttpStatus.CREATED);
-        } catch (Exception e) {
+        ContractDTO nc = contractsService.saveNew(contract);
+        if (nc != null) {
+            return new ResponseEntity<>(nc, HttpStatus.CREATED);
+        } else {
             return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }

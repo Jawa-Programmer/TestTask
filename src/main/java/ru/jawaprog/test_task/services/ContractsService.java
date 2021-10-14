@@ -1,12 +1,11 @@
-package ru.jawaprog.test_task.dao.services;
+package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDAO;
 import ru.jawaprog.test_task.dao.entities.ContractDAO;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
-import ru.jawaprog.test_task.mappers.ContractMapper;
-import ru.jawaprog.test_task.web.entities.ClientDTO;
+import ru.jawaprog.test_task.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
 import java.util.List;
@@ -31,9 +30,13 @@ public class ContractsService {
         return ContractMapper.INSTANCE.toDto(contractsRepository.findById(id).orElse(null));
     }
 
-    public ContractDTO saveNew(ContractDTO c) throws Exception {
+    ContractDAO getDAO(long id) {
+        return contractsRepository.findById(id).orElse(null);
+    }
+
+    public ContractDTO saveNew(ContractDTO c) {
         ClientDAO cl = clientsService.getDAO(c.getClient().getId());
-        if(cl == null) throw new Exception("client");
+        if (cl == null) return null;
         ContractDAO ct = new ContractDAO();
         ct.setClient(cl);
         ct.setNumber(c.getNumber());

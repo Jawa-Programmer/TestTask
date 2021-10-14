@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Set;
 
 @Entity
@@ -32,6 +31,6 @@ public class ContractDAO {
     @Getter
     @Setter
     @OneToMany(mappedBy = "contract", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<AccountADO> accounts;
+    private Set<AccountDAO> accounts;
 
 }

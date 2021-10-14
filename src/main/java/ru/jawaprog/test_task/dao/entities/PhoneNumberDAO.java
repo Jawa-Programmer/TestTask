@@ -25,6 +25,6 @@ public class PhoneNumberDAO {
     @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "account_id")
-    private AccountADO account;
+    private AccountDAO account;
 
 }
