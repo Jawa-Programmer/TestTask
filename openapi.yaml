@@ -132,27 +132,7 @@ paths:
                   $ref: "#/components/schemas/contract"
         404:
           description: "Клиент с заданным id не найден"
-  /clients/{id}/phones:
-    get:
-      summary: "возвращает список номеров телефонов пользователя с указанным id"
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        200:
-          description: "Успешный запрос. В теле массив объектов номеров телефонов"
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/phoneNumber"
-        404:
-          description: "Клиент с заданным id не найден"
+
   /clients/findByName/{name}:
     get:
       summary: "Возвращает список клиентов, в имени которых содержится строка name (без учета регистра)"

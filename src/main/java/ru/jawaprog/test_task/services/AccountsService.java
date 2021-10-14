@@ -7,7 +7,9 @@ import ru.jawaprog.test_task.dao.entities.AccountDAO;
 import ru.jawaprog.test_task.dao.entities.ContractDAO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.services.mappers.AccountMapper;
+import ru.jawaprog.test_task.services.mappers.PhoneNumberMapper;
 import ru.jawaprog.test_task.web.entities.AccountDTO;
+import ru.jawaprog.test_task.web.entities.PhoneNumberDTO;
 
 import java.util.Collection;
 
@@ -29,6 +31,10 @@ public class AccountsService {
         return AccountMapper.INSTANCE.toDto(accountsRepository.findById(id).orElse(null));
     }
 
+    AccountDAO getDao(long id) {
+        return accountsRepository.findById(id).orElse(null);
+    }
+
     public AccountDTO saveNew(AccountDTO acc) {
         ContractDAO contract = contractsService.getDAO(acc.getContract().getId());
         if (contract == null) return null;
@@ -38,7 +44,7 @@ public class AccountsService {
         return AccountMapper.INSTANCE.toDto(accountsRepository.save(newAcc));
     }
 
-    public AccountDTO update(long id, Long number, Long contractId) throws Exception {
+    public AccountDTO update(long id, Integer number, Long contractId) throws Exception {
         AccountDAO acc = accountsRepository.findById(id).orElse(null);
         if (acc == null) return null;
         ContractDAO contract = contractsService.getDAO(contractId);
@@ -53,5 +59,11 @@ public class AccountsService {
 
     public void delete(long id) {
         accountsRepository.deleteById(id);
+    }
+
+    public Collection<PhoneNumberDTO> getAccountsPhones(long id) throws Exception {
+        AccountDAO accountDAO = accountsRepository.findById(id).orElse(null);
+        if (accountDAO == null) throw new Exception();
+        else return PhoneNumberMapper.INSTANCE.toDto(accountDAO.getPhoneNumbers());
     }
 }

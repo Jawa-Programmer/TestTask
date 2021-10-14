@@ -7,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.services.ContractsService;
+import ru.jawaprog.test_task.web.entities.AccountDTO;
 import ru.jawaprog.test_task.web.entities.ClientDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -30,16 +32,16 @@ public class ContractsController {
             return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
-    /*
+
         @GetMapping(path = "/{id}/accounts")
         public ResponseEntity<Collection<AccountDTO>> getContractAccounts(@PathVariable long id) {
-            ContractDAO c = contractsService.get(id);
-            if (c == null)
+            try {
+                return new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK);
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            else
-                return new ResponseEntity<>(c.getAccounts(), HttpStatus.OK);
+            }
         }
-    */
+
     @GetMapping
     public ResponseEntity<List<ContractDTO>> getContracts() {
         return new ResponseEntity<>(contractsService.findAll(), HttpStatus.OK);

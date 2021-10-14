@@ -1,5 +1,12 @@
 package ru.jawaprog.test_task.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +17,7 @@ import ru.jawaprog.test_task.web.entities.ContractDTO;
 
 import java.util.*;
 
+@Tag(name = "Client", description = "Доступ к базе клиентов МТС")
 @RestController
 @RequestMapping("clients")
 public class ClientsController {
@@ -34,28 +42,22 @@ public class ClientsController {
         }
     }
 
-/*
-    @GetMapping(path = "/{id}/phones")
-    public ResponseEntity<Collection<PhoneNumberDAO>> getClientsPhones(@PathVariable long id) {
-        ClientDTO c = clientsService.get(id);
-        if (c == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else {
-            Set<PhoneNumberDAO> phones = new HashSet<>();
-            for (ContractDTO contract : c.getContracts())
-                for (AccountADO account : contract.getAccounts())
-                    phones.addAll(account.getPhoneNumbers());
-            return new ResponseEntity<>(phones, HttpStatus.OK);
-        }
-    }
-*/
-
     @GetMapping(path = "/findByName/{name}")
     public ResponseEntity<Collection<ClientDTO>> findClients(@PathVariable String name) {
         return new ResponseEntity<>(clientsService.findByName(name), HttpStatus.OK);
     }
 
-
+    @Operation(summary = "Возвращает всех клиентов", tags = "client")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешный запрос",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = ClientDTO.class)))
+                    })
+    })
     @GetMapping
     public ResponseEntity<Collection<ClientDTO>> getClients() {
         return new ResponseEntity<>(clientsService.findAll(), HttpStatus.OK);

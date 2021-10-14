@@ -2,12 +2,16 @@ package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.jawaprog.test_task.dao.entities.AccountDAO;
 import ru.jawaprog.test_task.dao.entities.ClientDAO;
 import ru.jawaprog.test_task.dao.entities.ContractDAO;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
+import ru.jawaprog.test_task.services.mappers.AccountMapper;
 import ru.jawaprog.test_task.services.mappers.ContractMapper;
+import ru.jawaprog.test_task.web.entities.AccountDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -56,5 +60,11 @@ public class ContractsService {
 
     public void delete(long id) {
         contractsRepository.deleteById(id);
+    }
+
+    public Collection<AccountDTO> getContractsAccounts(long id) throws Exception {
+        ContractDAO contractDAO = contractsRepository.findById(id).orElse(null);
+        if (contractDAO == null) throw new Exception();
+        else return AccountMapper.INSTANCE.toDto(contractDAO.getAccounts());
     }
 }
