@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.entities;
+package ru.jawaprog.test_task.dao.entities;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "phone_numbers")
-public class PhoneNumber {
+public class PhoneNumberDAO {
     @Getter
     @Setter
     @Id
@@ -25,6 +25,6 @@ public class PhoneNumber {
     @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "account_id")
-    private Account account;
+    private AccountDAO account;
 
 }

@@ -1,17 +1,18 @@
-package ru.jawaprog.test_task.entities;
+package ru.jawaprog.test_task.dao.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
 @Table(name = "clients")
-public class Client {
+public class ClientDAO {
     public enum ClientType {INDIVIDUAL, ENTITY}
 
     @Getter
@@ -32,10 +33,9 @@ public class Client {
     @Enumerated(EnumType.ORDINAL)
     private ClientType type;
 
-    @JsonIgnore // что бы не возникало рекурсии. В будущем можно сделать свой JSON сериализатор
     @Getter
     @Setter
     @OneToMany(mappedBy = "client", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Collection<Contract> contracts;
+    private Set<ContractDAO> contracts;
 
 }

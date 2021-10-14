@@ -1,16 +1,16 @@
-package ru.jawaprog.test_task.entities;
+package ru.jawaprog.test_task.dao.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Table(name = "accounts")
-public class Account {
+public class AccountDAO {
     @Getter
     @Setter
     @Id
@@ -22,17 +22,16 @@ public class Account {
     @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "contract_id")
-    private Contract contract;
+    private ContractDAO contract;
 
     @Getter
     @Setter
     @Column(nullable = false)
-    private int number;
+    private long number;
 
-    @JsonIgnore // что бы не возникало рекурсии. В будущем можно сделать свой JSON сериализатор
     @Getter
     @Setter
     @OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Collection<PhoneNumber> phoneNumbers;
+    private Set<PhoneNumberDAO> phoneNumbers;
 
 }
