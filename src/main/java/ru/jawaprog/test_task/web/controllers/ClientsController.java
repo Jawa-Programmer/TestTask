@@ -1,12 +1,9 @@
 package ru.jawaprog.test_task.web.controllers;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +12,18 @@ import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.web.entities.ClientDTO;
 import ru.jawaprog.test_task.web.entities.ContractDTO;
 
-import java.util.*;
+import java.util.Collection;
 
-@Tag(name = "Client", description = "Доступ к базе клиентов МТС")
 @RestController
 @RequestMapping("clients")
 public class ClientsController {
     @Autowired
     private ClientsService clientsService;
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 404, message = "Клиент не найден")
+    })
     @GetMapping(path = "/{id}")
     public ResponseEntity<ClientDTO> getClient(@PathVariable long id) {
         ClientDTO c = clientsService.get(id);
@@ -33,6 +33,10 @@ public class ClientsController {
             return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно"),
+            @ApiResponse(code = 404, message = "Клиент не найден")
+    })
     @GetMapping(path = "/{id}/contracts")
     public ResponseEntity<Collection<ContractDTO>> getClientsContracts(@PathVariable long id) {
         try {
@@ -42,27 +46,25 @@ public class ClientsController {
         }
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно")
+    })
     @GetMapping(path = "/findByName/{name}")
     public ResponseEntity<Collection<ClientDTO>> findClients(@PathVariable String name) {
         return new ResponseEntity<>(clientsService.findByName(name), HttpStatus.OK);
     }
 
-    @Operation(summary = "Возвращает всех клиентов", tags = "client")
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Успешный запрос",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = ClientDTO.class)))
-                    })
+            @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping
     public ResponseEntity<Collection<ClientDTO>> getClients() {
         return new ResponseEntity<>(clientsService.findAll(), HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Успешно добавлен")
+    })
     @PostMapping
     public ResponseEntity<ClientDTO> postClient(@RequestParam(value = "fullName") String fullName,
                                                 @RequestParam(value = "type") ClientDTO.ClientType type) {
@@ -72,6 +74,9 @@ public class ClientsController {
         return new ResponseEntity<>(clientsService.saveNew(client), HttpStatus.CREATED);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно обновлен"),
+            @ApiResponse(code = 404, message = "Клиент не найден")})
     @PutMapping("/{id}")
     public ResponseEntity<ClientDTO> postClient(@PathVariable long id,
                                                 @RequestParam(value = "fullName", required = false) String fullName,
@@ -83,6 +88,10 @@ public class ClientsController {
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Успешно удален"),
+            @ApiResponse(code = 404, message = "Клиент не найден")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity deleteClient(@PathVariable long id) {
         try {

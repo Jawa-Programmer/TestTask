@@ -1,6 +1,8 @@
 package ru.jawaprog.test_task.web.controllers;
 
 
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ public class PhoneNumbersController {
     @Autowired
     private AccountsService accountsService;
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно")
+    })
     @GetMapping(path = "/{id}")
     public ResponseEntity<PhoneNumberDTO> getPhoneNumber(@PathVariable long id) {
         PhoneNumberDTO phoneNumber = phoneNumbersService.get(id);
@@ -31,11 +36,18 @@ public class PhoneNumbersController {
             return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно")
+    })
     @GetMapping
     public ResponseEntity<Collection<PhoneNumberDTO>> getPhoneNumbers() {
         return new ResponseEntity<>(phoneNumbersService.findAll(), HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Успешно добавлен"),
+            @ApiResponse(code = 422, message = "Счет с указанным accountId не найден")
+    })
     @PostMapping
     public ResponseEntity<PhoneNumberDTO> postPhoneNumber(@RequestParam(value = "number") String number,
                                                           @RequestParam(value = "accountId") long accountId) {
@@ -52,6 +64,11 @@ public class PhoneNumbersController {
             return new ResponseEntity<>(phoneNumber, HttpStatus.CREATED);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно обновлен"),
+            @ApiResponse(code = 404, message = "Телефон не найден"),
+            @ApiResponse(code = 422, message = "Счет с указанным accountId не найден")
+    })
     @PutMapping(path = "/{id}")
     public ResponseEntity<PhoneNumberDTO> putPhoneNumber(@PathVariable long id,
                                                          @RequestParam(value = "number", required = false) String number,
@@ -68,6 +85,10 @@ public class PhoneNumbersController {
             return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Успешно удален"),
+            @ApiResponse(code = 404, message = "Телефон не найден")
+    })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity deletePhoneNumber(@PathVariable long id) {
         try {

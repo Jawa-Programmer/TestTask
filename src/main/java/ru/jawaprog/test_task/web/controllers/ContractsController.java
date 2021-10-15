@@ -1,6 +1,8 @@
 package ru.jawaprog.test_task.web.controllers;
 
 
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,9 @@ public class ContractsController {
     @Autowired
     private ClientsService clientsService;
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно")
+    })
     @GetMapping(path = "/{id}")
     public ResponseEntity<ContractDTO> getContract(@PathVariable long id) {
         ContractDTO c = contractsService.get(id);
@@ -33,20 +38,30 @@ public class ContractsController {
     }
 
 
-        @GetMapping(path = "/{id}/accounts")
-        public ResponseEntity<Collection<AccountDTO>> getContractAccounts(@PathVariable long id) {
-            try {
-                return new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно")
+    })
+    @GetMapping(path = "/{id}/accounts")
+    public ResponseEntity<Collection<AccountDTO>> getContractAccounts(@PathVariable long id) {
+        try {
+            return new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно")
+    })
     @GetMapping
     public ResponseEntity<List<ContractDTO>> getContracts() {
         return new ResponseEntity<>(contractsService.findAll(), HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Успешно добавлен"),
+            @ApiResponse(code = 422, message = "Клиент с указанным clientId не найден")
+    })
     @PostMapping
     public ResponseEntity<ContractDTO> postContract(@RequestParam(value = "number") long contractNumber,
                                                     @RequestParam(value = "clientId") long clientId) {
@@ -64,6 +79,11 @@ public class ContractsController {
         }
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Успешно обновлен"),
+            @ApiResponse(code = 404, message = "Контракт не найден"),
+            @ApiResponse(code = 422, message = "Клиент с указанным clientId не найден")
+    })
     @PutMapping(path = "/{id}")
     public ResponseEntity<ContractDTO> putContract(@PathVariable long id, @RequestParam(value = "number", required = false) Long contractNumber,
                                                    @RequestParam(value = "clientId", required = false) Long clientId) {
@@ -75,6 +95,10 @@ public class ContractsController {
         }
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Успешно удален"),
+            @ApiResponse(code = 404, message = "Контракт не найден")
+    })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity deleteContract(@PathVariable long id) {
         try {
