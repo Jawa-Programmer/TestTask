@@ -85,16 +85,8 @@ public class AccountController {
                                               @RequestParam(value = "number", required = false) Integer number,
                                               @RequestParam(value = "contractId", required = false) Long contractId) {
         Account account;
-        try {
-            account = accountsService.update(id, number, contractId);
-        } catch (Exception e) {
-
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        if (account == null)
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        else
-            return new ResponseEntity<>(account, HttpStatus.CREATED);
+        account = accountsService.update(id, number, contractId);
+        return new ResponseEntity<>(account, HttpStatus.CREATED);
     }
 
     @ApiResponses(value = {
@@ -103,11 +95,7 @@ public class AccountController {
     })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity deleteAccount(@PathVariable long id) {
-        try {
-            accountsService.delete(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+        accountsService.delete(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

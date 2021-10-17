@@ -30,7 +30,7 @@ public class ContractsService {
     }
 
     public Contract get(long id) {
-        return ContractMapper.INSTANCE.toDto(contractsRepository.findById(id).orElse(null));
+        return ContractMapper.INSTANCE.toDto(contractsRepository.findById(id).get());
     }
 
     ContractDTO getDAO(long id) {
@@ -39,19 +39,19 @@ public class ContractsService {
 
     public Contract saveNew(Contract c) {
         ClientDTO cl = clientsService.getDAO(c.getClient().getId());
-        if (cl == null) return null;
+        if (cl == null) throw new IllegalArgumentException();
         ContractDTO ct = new ContractDTO();
         ct.setClient(cl);
         ct.setNumber(c.getNumber());
         return ContractMapper.INSTANCE.toDto(contractsRepository.save(ct));
     }
 
-    public Contract update(long id, Long number, Long clientId) throws Exception {
-        ContractDTO ctr = contractsRepository.findById(id).orElse(null);
+    public Contract update(long id, Long number, Long clientId) {
+        ContractDTO ctr = contractsRepository.findById(id).get();
         if (number != null) ctr.setNumber(number);
         if (clientId != null) {
             ClientDTO cl = clientsService.getDAO(clientId);
-            if (cl == null) throw new Exception("client");
+            if (cl == null) throw new IllegalArgumentException();
             ctr.setClient(cl);
         }
         return ContractMapper.INSTANCE.toDto(contractsRepository.save(ctr));
@@ -61,9 +61,8 @@ public class ContractsService {
         contractsRepository.deleteById(id);
     }
 
-    public Collection<Account> getContractsAccounts(long id) throws Exception {
-        ContractDTO contractDTO = contractsRepository.findById(id).orElse(null);
-        if (contractDTO == null) throw new Exception();
-        else return AccountMapper.INSTANCE.toDto(contractDTO.getAccounts());
+    public Collection<Account> getContractsAccounts(long id) {
+        ContractDTO contractDTO = contractsRepository.findById(id).get();
+        return AccountMapper.INSTANCE.toDto(contractDTO.getAccounts());
     }
 }

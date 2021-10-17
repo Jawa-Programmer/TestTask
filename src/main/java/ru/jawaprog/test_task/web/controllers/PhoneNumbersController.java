@@ -19,8 +19,6 @@ import java.util.Collection;
 public class PhoneNumbersController {
     @Autowired
     private PhoneNumbersService phoneNumbersService;
-    @Autowired
-    private AccountsService accountsService;
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешно")
@@ -28,10 +26,7 @@ public class PhoneNumbersController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<PhoneNumber> getPhoneNumber(@PathVariable long id) {
         PhoneNumber phoneNumber = phoneNumbersService.get(id);
-        if (phoneNumber == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
+        return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
     }
 
     @ApiResponses(value = {
@@ -56,10 +51,8 @@ public class PhoneNumbersController {
         phoneNumber.setAccount(account);
         phoneNumber.setNumber(number);
         phoneNumber = phoneNumbersService.saveNew(phoneNumber);
-        if (phoneNumber == null)
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        else
-            return new ResponseEntity<>(phoneNumber, HttpStatus.CREATED);
+
+        return new ResponseEntity<>(phoneNumber, HttpStatus.CREATED);
     }
 
     @ApiResponses(value = {
@@ -72,15 +65,8 @@ public class PhoneNumbersController {
                                                       @RequestParam(value = "number", required = false) String number,
                                                       @RequestParam(value = "accountId", required = false) Long accountId) {
         PhoneNumber phoneNumber;
-        try {
-            phoneNumber = phoneNumbersService.update(id, number, accountId);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        if (phoneNumber == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
+        phoneNumber = phoneNumbersService.update(id, number, accountId);
+        return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
     }
 
     @ApiResponses(value = {
@@ -89,11 +75,8 @@ public class PhoneNumbersController {
     })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity deletePhoneNumber(@PathVariable long id) {
-        try {
-            phoneNumbersService.delete(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+        phoneNumbersService.delete(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+
     }
 }

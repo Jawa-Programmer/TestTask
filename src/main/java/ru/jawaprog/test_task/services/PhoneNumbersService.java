@@ -31,24 +31,24 @@ public class PhoneNumbersService {
     }
 
     public PhoneNumber get(long id) {
-        return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.findById(id).orElse(null));
+        return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.findById(id).get());
     }
 
     public PhoneNumber saveNew(PhoneNumber num) {
         AccountDTO acc = accountsService.getDao(num.getAccount().getId());
-        if (acc == null) return null;
+        if (acc == null) throw new IllegalArgumentException();
         PhoneNumberDTO toRet = new PhoneNumberDTO();
         toRet.setNumber(num.getNumber());
         toRet.setAccount(acc);
         return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.save(toRet));
     }
 
-    public PhoneNumber update(long id, String number, Long accountId) throws Exception {
-        PhoneNumberDTO toRet = phoneNumbersRepository.findById(id).orElse(null);
+    public PhoneNumber update(long id, String number, Long accountId) {
+        PhoneNumberDTO toRet = phoneNumbersRepository.findById(id).get();
         if (toRet == null) return null;
         if (accountId != null) {
             AccountDTO acc = accountsService.getDao(accountId);
-            if (acc == null) throw new Exception();
+            if (acc == null) throw new IllegalArgumentException();
             toRet.setAccount(acc);
         }
         if (number != null) toRet.setNumber(number);

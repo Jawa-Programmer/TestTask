@@ -28,10 +28,7 @@ public class ClientsController {
             @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id
     ) {
         Client c = clientsService.get(id);
-        if (c == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>(c, HttpStatus.OK);
+        return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Получить список контрактов пользователя с данным id")
@@ -43,11 +40,7 @@ public class ClientsController {
     public ResponseEntity<Collection<Contract>> getClientsContracts(
             @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id
     ) {
-        try {
-            return new ResponseEntity<>(clientsService.getClientsContracts(id), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(clientsService.getClientsContracts(id), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Получить список клиентов, в чьем имени содержится данная подстрока")
@@ -101,15 +94,12 @@ public class ClientsController {
             @ApiResponse(code = 200, message = "Успешно обновлен"),
             @ApiResponse(code = 404, message = "Клиент не найден")})
     @PutMapping("/{id}")
-    public ResponseEntity<Client> postClient(
+    public ResponseEntity<Client> updateClient(
             @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id,
             @ApiParam(value = "Имя физ. лица или наименование организации") @RequestParam(value = "fullName", required = false) String fullName,
             @ApiParam(value = "Тип клиента") @RequestParam(value = "type", required = false) Client.ClientType type
     ) {
         Client client = clientsService.update(id, fullName, type);
-        if (client == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
@@ -122,12 +112,8 @@ public class ClientsController {
     public ResponseEntity deleteClient(
             @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id
     ) {
-        try {
-            clientsService.delete(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        clientsService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

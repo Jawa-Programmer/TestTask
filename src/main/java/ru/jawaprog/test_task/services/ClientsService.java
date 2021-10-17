@@ -33,7 +33,7 @@ public class ClientsService {
 
 
     public Client get(long id) {
-        return ClientMapper.INSTANCE.toDto(clientsRepository.findById(id).orElse(null));
+        return ClientMapper.INSTANCE.toDto(clientsRepository.findById(id).get());
     }
 
     // пакетный модификатор позволит вызывать его только из других сервисов
@@ -49,8 +49,7 @@ public class ClientsService {
     }
 
     public Client update(long id, String fullName, Client.ClientType type) {
-        ClientDTO cl = clientsRepository.findById(id).orElse(null);
-        if (cl == null) return null;
+        ClientDTO cl = clientsRepository.findById(id).get();
         if (fullName != null)
             cl.setFullName(fullName);
         if (type != null)
@@ -58,9 +57,8 @@ public class ClientsService {
         return ClientMapper.INSTANCE.toDto(clientsRepository.save(cl));
     }
 
-    public Collection<Contract> getClientsContracts(long id) throws Exception {
-        ClientDTO cl = clientsRepository.findById(id).orElse(null);
-        if (cl == null) throw new Exception();
+    public Collection<Contract> getClientsContracts(long id)  {
+        ClientDTO cl = clientsRepository.findById(id).get();
         return ContractMapper.INSTANCE.toDto(cl.getContracts());
     }
 

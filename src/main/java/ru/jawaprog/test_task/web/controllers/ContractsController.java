@@ -22,19 +22,13 @@ public class ContractsController {
     @Autowired
     private ContractsService contractsService;
 
-    @Autowired
-    private ClientsService clientsService;
-
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping(path = "/{id}")
     public ResponseEntity<Contract> getContract(@PathVariable long id) {
         Contract c = contractsService.get(id);
-        if (c == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else
-            return new ResponseEntity<>(c, HttpStatus.OK);
+        return new ResponseEntity<>(c, HttpStatus.OK);
     }
 
 
@@ -43,11 +37,7 @@ public class ContractsController {
     })
     @GetMapping(path = "/{id}/accounts")
     public ResponseEntity<Collection<Account>> getContractAccounts(@PathVariable long id) {
-        try {
-            return new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK);
     }
 
     @ApiResponses(value = {
@@ -72,11 +62,7 @@ public class ContractsController {
         contract.setNumber(contractNumber);
         contract.setClient(client);
         Contract nc = contractsService.saveNew(contract);
-        if (nc != null) {
-            return new ResponseEntity<>(nc, HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        return new ResponseEntity<>(nc, HttpStatus.CREATED);
     }
 
     @ApiResponses(value = {
@@ -87,12 +73,7 @@ public class ContractsController {
     @PutMapping(path = "/{id}")
     public ResponseEntity<Contract> putContract(@PathVariable long id, @RequestParam(value = "number", required = false) Long contractNumber,
                                                 @RequestParam(value = "clientId", required = false) Long clientId) {
-
-        try {
-            return new ResponseEntity<>(contractsService.update(id, contractNumber, clientId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        return new ResponseEntity<>(contractsService.update(id, contractNumber, clientId), HttpStatus.OK);
     }
 
     @ApiResponses(value = {
@@ -101,11 +82,7 @@ public class ContractsController {
     })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity deleteContract(@PathVariable long id) {
-        try {
-            contractsService.delete(id);
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+        contractsService.delete(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }

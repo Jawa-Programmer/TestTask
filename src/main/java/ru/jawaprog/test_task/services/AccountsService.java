@@ -28,7 +28,7 @@ public class AccountsService {
     }
 
     public Account get(long id) {
-        return AccountMapper.INSTANCE.toDto(accountsRepository.findById(id).orElse(null));
+        return AccountMapper.INSTANCE.toDto(accountsRepository.findById(id).get());
     }
 
     AccountDTO getDao(long id) {
@@ -37,20 +37,18 @@ public class AccountsService {
 
     public Account saveNew(Account acc) {
         ContractDTO contract = contractsService.getDAO(acc.getContract().getId());
-        if (contract == null) return null;
+        if (contract == null) throw new IllegalArgumentException();
         AccountDTO newAcc = new AccountDTO();
         newAcc.setContract(contract);
         newAcc.setNumber(acc.getNumber());
         return AccountMapper.INSTANCE.toDto(accountsRepository.save(newAcc));
     }
 
-    public Account update(long id, Integer number, Long contractId) throws Exception {
-        AccountDTO acc = accountsRepository.findById(id).orElse(null);
-        if (acc == null) return null;
-        ContractDTO contract = contractsService.getDAO(contractId);
+    public Account update(long id, Integer number, Long contractId) {
+        AccountDTO acc = accountsRepository.findById(id).get();
         if (contractId != null) {
             ContractDTO ct = contractsService.getDAO(contractId);
-            if (ct == null) throw new Exception();
+            if (ct == null) throw new IllegalArgumentException();
             acc.setContract(ct);
         }
         if (number != null) acc.setNumber(number);
@@ -61,9 +59,8 @@ public class AccountsService {
         accountsRepository.deleteById(id);
     }
 
-    public Collection<PhoneNumber> getAccountsPhones(long id) throws Exception {
-        AccountDTO accountDTO = accountsRepository.findById(id).orElse(null);
-        if (accountDTO == null) throw new Exception();
-        else return PhoneNumberMapper.INSTANCE.toDto(accountDTO.getPhoneNumbers());
+    public Collection<PhoneNumber> getAccountsPhones(long id) {
+        AccountDTO accountDTO = accountsRepository.findById(id).get();
+        return PhoneNumberMapper.INSTANCE.toDto(accountDTO.getPhoneNumbers());
     }
 }
