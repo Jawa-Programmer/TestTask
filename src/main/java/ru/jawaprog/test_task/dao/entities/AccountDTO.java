@@ -5,33 +5,26 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "accounts")
-public class AccountDAO {
-    @Getter
-    @Setter
+public class AccountDTO {
     @Id
     @GenericGenerator(name = "generator", strategy = "increment")
     @GeneratedValue(generator = "generator")
     private long id;
 
-    @Getter
-    @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "contract_id")
-    private ContractDAO contract;
+    private ContractDTO contract;
 
-    @Getter
-    @Setter
     @Column(nullable = false)
     private long number;
 
-    @Getter
-    @Setter
     @OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<PhoneNumberDAO> phoneNumbers;
+    private Set<PhoneNumberDTO> phoneNumbers;
 
 }

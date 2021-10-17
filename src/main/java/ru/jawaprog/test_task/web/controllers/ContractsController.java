@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.services.ContractsService;
-import ru.jawaprog.test_task.web.entities.AccountDTO;
-import ru.jawaprog.test_task.web.entities.ClientDTO;
-import ru.jawaprog.test_task.web.entities.ContractDTO;
+import ru.jawaprog.test_task.web.entities.Account;
+import ru.jawaprog.test_task.web.entities.Client;
+import ru.jawaprog.test_task.web.entities.Contract;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,8 +29,8 @@ public class ContractsController {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping(path = "/{id}")
-    public ResponseEntity<ContractDTO> getContract(@PathVariable long id) {
-        ContractDTO c = contractsService.get(id);
+    public ResponseEntity<Contract> getContract(@PathVariable long id) {
+        Contract c = contractsService.get(id);
         if (c == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else
@@ -42,7 +42,7 @@ public class ContractsController {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping(path = "/{id}/accounts")
-    public ResponseEntity<Collection<AccountDTO>> getContractAccounts(@PathVariable long id) {
+    public ResponseEntity<Collection<Account>> getContractAccounts(@PathVariable long id) {
         try {
             return new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK);
         } catch (Exception e) {
@@ -54,7 +54,7 @@ public class ContractsController {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping
-    public ResponseEntity<List<ContractDTO>> getContracts() {
+    public ResponseEntity<List<Contract>> getContracts() {
         return new ResponseEntity<>(contractsService.findAll(), HttpStatus.OK);
     }
 
@@ -63,15 +63,15 @@ public class ContractsController {
             @ApiResponse(code = 422, message = "Клиент с указанным clientId не найден")
     })
     @PostMapping
-    public ResponseEntity<ContractDTO> postContract(@RequestParam(value = "number") long contractNumber,
-                                                    @RequestParam(value = "clientId") long clientId) {
-        ClientDTO client = new ClientDTO();
+    public ResponseEntity<Contract> postContract(@RequestParam(value = "number") long contractNumber,
+                                                 @RequestParam(value = "clientId") long clientId) {
+        Client client = new Client();
         client.setId(clientId);
 
-        ContractDTO contract = new ContractDTO();
+        Contract contract = new Contract();
         contract.setNumber(contractNumber);
         contract.setClient(client);
-        ContractDTO nc = contractsService.saveNew(contract);
+        Contract nc = contractsService.saveNew(contract);
         if (nc != null) {
             return new ResponseEntity<>(nc, HttpStatus.CREATED);
         } else {
@@ -85,8 +85,8 @@ public class ContractsController {
             @ApiResponse(code = 422, message = "Клиент с указанным clientId не найден")
     })
     @PutMapping(path = "/{id}")
-    public ResponseEntity<ContractDTO> putContract(@PathVariable long id, @RequestParam(value = "number", required = false) Long contractNumber,
-                                                   @RequestParam(value = "clientId", required = false) Long clientId) {
+    public ResponseEntity<Contract> putContract(@PathVariable long id, @RequestParam(value = "number", required = false) Long contractNumber,
+                                                @RequestParam(value = "clientId", required = false) Long clientId) {
 
         try {
             return new ResponseEntity<>(contractsService.update(id, contractNumber, clientId), HttpStatus.OK);

@@ -7,14 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDAO;
 import ru.jawaprog.test_task.services.AccountsService;
 import ru.jawaprog.test_task.services.PhoneNumbersService;
-import ru.jawaprog.test_task.web.entities.AccountDTO;
-import ru.jawaprog.test_task.web.entities.PhoneNumberDTO;
+import ru.jawaprog.test_task.web.entities.Account;
+import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequestMapping("phone-numbers")
@@ -28,8 +26,8 @@ public class PhoneNumbersController {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping(path = "/{id}")
-    public ResponseEntity<PhoneNumberDTO> getPhoneNumber(@PathVariable long id) {
-        PhoneNumberDTO phoneNumber = phoneNumbersService.get(id);
+    public ResponseEntity<PhoneNumber> getPhoneNumber(@PathVariable long id) {
+        PhoneNumber phoneNumber = phoneNumbersService.get(id);
         if (phoneNumber == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else
@@ -40,7 +38,7 @@ public class PhoneNumbersController {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping
-    public ResponseEntity<Collection<PhoneNumberDTO>> getPhoneNumbers() {
+    public ResponseEntity<Collection<PhoneNumber>> getPhoneNumbers() {
         return new ResponseEntity<>(phoneNumbersService.findAll(), HttpStatus.OK);
     }
 
@@ -49,12 +47,12 @@ public class PhoneNumbersController {
             @ApiResponse(code = 422, message = "Счет с указанным accountId не найден")
     })
     @PostMapping
-    public ResponseEntity<PhoneNumberDTO> postPhoneNumber(@RequestParam(value = "number") String number,
-                                                          @RequestParam(value = "accountId") long accountId) {
-        AccountDTO account = new AccountDTO();
+    public ResponseEntity<PhoneNumber> postPhoneNumber(@RequestParam(value = "number") String number,
+                                                       @RequestParam(value = "accountId") long accountId) {
+        Account account = new Account();
         account.setId(accountId);
 
-        PhoneNumberDTO phoneNumber = new PhoneNumberDTO();
+        PhoneNumber phoneNumber = new PhoneNumber();
         phoneNumber.setAccount(account);
         phoneNumber.setNumber(number);
         phoneNumber = phoneNumbersService.saveNew(phoneNumber);
@@ -70,10 +68,10 @@ public class PhoneNumbersController {
             @ApiResponse(code = 422, message = "Счет с указанным accountId не найден")
     })
     @PutMapping(path = "/{id}")
-    public ResponseEntity<PhoneNumberDTO> putPhoneNumber(@PathVariable long id,
-                                                         @RequestParam(value = "number", required = false) String number,
-                                                         @RequestParam(value = "accountId", required = false) Long accountId) {
-        PhoneNumberDTO phoneNumber;
+    public ResponseEntity<PhoneNumber> putPhoneNumber(@PathVariable long id,
+                                                      @RequestParam(value = "number", required = false) String number,
+                                                      @RequestParam(value = "accountId", required = false) Long accountId) {
+        PhoneNumber phoneNumber;
         try {
             phoneNumber = phoneNumbersService.update(id, number, accountId);
         } catch (Exception e) {

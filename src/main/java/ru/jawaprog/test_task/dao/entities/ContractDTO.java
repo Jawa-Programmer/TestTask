@@ -7,30 +7,24 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "contracts")
-public class ContractDAO {
-    @Getter
-    @Setter
+public class ContractDTO {
     @Id
     @GenericGenerator(name = "generator", strategy = "increment")
     @GeneratedValue(generator = "generator")
     private long id;
 
-    @Getter
-    @Setter
     @ManyToOne(optional = false)
     @JoinColumn(name = "client_id")
-    private ClientDAO client;
+    private ClientDTO client;
 
-    @Getter
-    @Setter
     @Column(nullable = false, name = "number")
     private long number;
 
-    @Getter
-    @Setter
     @OneToMany(mappedBy = "contract", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<AccountDAO> accounts;
+    private Set<AccountDTO> accounts;
 
 }

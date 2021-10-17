@@ -6,25 +6,23 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "phone_numbers")
-public class PhoneNumberDAO {
-    @Getter
-    @Setter
+public class PhoneNumberDTO {
+
     @Id
     @GenericGenerator(name = "generator", strategy = "increment")
     @GeneratedValue(generator = "generator")
     private long id;
 
-    @Getter
-    @Setter
     @Column(nullable = false)
     private String number;
 
-    @Getter
-    @Setter
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "account_id")
-    private AccountDAO account;
+    private AccountDTO account;
 
 }
