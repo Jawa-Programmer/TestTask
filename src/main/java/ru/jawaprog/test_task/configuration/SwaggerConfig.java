@@ -1,6 +1,5 @@
 package ru.jawaprog.test_task.configuration;
 
-import io.swagger.annotations.ApiResponses;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;

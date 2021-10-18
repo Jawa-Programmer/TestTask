@@ -2,6 +2,7 @@ package ru.jawaprog.test_task.web.controllers;
 
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import ru.jawaprog.test_task.web.entities.Client;
 import ru.jawaprog.test_task.web.entities.Contract;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 @Api(value = "База клиентов МТС", description = "RESTful сервис взаимодействия с БД клиентов МТС")
 @RestController
@@ -18,6 +20,12 @@ public class ClientsController {
     @Autowired
     private ClientsService clientsService;
 
+    @ExceptionHandler(value = {NoSuchElementException.class, EmptyResultDataAccessException.class})
+    protected ResponseEntity<Object> handleNotFound() {
+        return new ResponseEntity<>("Клиент с переданным id не найден", HttpStatus.NOT_FOUND);
+    }
+
+
     @ApiOperation(value = "Получить клиента по id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешно"),
@@ -25,7 +33,7 @@ public class ClientsController {
     })
     @GetMapping(path = "/{id}")
     public ResponseEntity<Client> getClient(
-            @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id
+            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
         Client c = clientsService.get(id);
         return new ResponseEntity<>(c, HttpStatus.OK);
@@ -38,7 +46,7 @@ public class ClientsController {
     })
     @GetMapping(path = "/{id}/contracts")
     public ResponseEntity<Collection<Contract>> getClientsContracts(
-            @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id
+            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
         return new ResponseEntity<>(clientsService.getClientsContracts(id), HttpStatus.OK);
     }
@@ -95,7 +103,7 @@ public class ClientsController {
             @ApiResponse(code = 404, message = "Клиент не найден")})
     @PutMapping("/{id}")
     public ResponseEntity<Client> updateClient(
-            @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id,
+            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id,
             @ApiParam(value = "Имя физ. лица или наименование организации") @RequestParam(value = "fullName", required = false) String fullName,
             @ApiParam(value = "Тип клиента") @RequestParam(value = "type", required = false) Client.ClientType type
     ) {
@@ -110,7 +118,7 @@ public class ClientsController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity deleteClient(
-            @ApiParam(value = "Идентификатор клиента", required = true) @PathVariable long id
+            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
         clientsService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
