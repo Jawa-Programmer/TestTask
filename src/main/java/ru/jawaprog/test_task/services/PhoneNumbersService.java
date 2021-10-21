@@ -1,15 +1,20 @@
 package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
+import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.services.mappers.PhoneNumberMapper;
+import ru.jawaprog.test_task.web.entities.Account;
 import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class PhoneNumbersService {
@@ -31,12 +36,16 @@ public class PhoneNumbersService {
     }
 
     public PhoneNumber get(long id) {
-        return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.findById(id).get());
+        try {
+            return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.findById(id).get());
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(PhoneNumber.class);
+        }
     }
 
     public PhoneNumber saveNew(PhoneNumber num) {
         AccountDTO acc = accountsService.getDao(num.getAccount().getId());
-        if (acc == null) throw new IllegalArgumentException();
+        if (acc == null) throw new ForeignKeyException(Account.class);
         PhoneNumberDTO toRet = new PhoneNumberDTO();
         toRet.setNumber(num.getNumber());
         toRet.setAccount(acc);
@@ -44,18 +53,26 @@ public class PhoneNumbersService {
     }
 
     public PhoneNumber update(long id, String number, Long accountId) {
-        PhoneNumberDTO toRet = phoneNumbersRepository.findById(id).get();
-        if (toRet == null) return null;
-        if (accountId != null) {
-            AccountDTO acc = accountsService.getDao(accountId);
-            if (acc == null) throw new IllegalArgumentException();
-            toRet.setAccount(acc);
+        try {
+            PhoneNumberDTO toRet = phoneNumbersRepository.findById(id).get();
+            if (toRet == null) return null;
+            if (accountId != null) {
+                AccountDTO acc = accountsService.getDao(accountId);
+                if (acc == null) throw new ForeignKeyException(Account.class);
+                toRet.setAccount(acc);
+            }
+            if (number != null) toRet.setNumber(number);
+            return PhoneNumberMapper.INSTANCE.toDto(toRet);
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(PhoneNumber.class);
         }
-        if (number != null) toRet.setNumber(number);
-        return PhoneNumberMapper.INSTANCE.toDto(toRet);
     }
 
     public void delete(long id) {
-        phoneNumbersRepository.deleteById(id);
+        try {
+            phoneNumbersRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new NotFoundException(PhoneNumber.class);
+        }
     }
 }

@@ -1,8 +1,10 @@
 package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
+import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
 import ru.jawaprog.test_task.services.mappers.ClientMapper;
 import ru.jawaprog.test_task.services.mappers.ContractMapper;
@@ -12,6 +14,7 @@ import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 
 @Service
 public class ClientsService {
@@ -31,7 +34,11 @@ public class ClientsService {
 
 
     public Client get(long id) {
-        return ClientMapper.INSTANCE.toDto(clientsRepository.findById(id).get());
+        try {
+            return ClientMapper.INSTANCE.toDto(clientsRepository.findById(id).get());
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(Client.class);
+        }
     }
 
     // пакетный модификатор позволит вызывать его только из других сервисов
@@ -47,21 +54,33 @@ public class ClientsService {
     }
 
     public Client update(long id, String fullName, Client.ClientType type) {
-        ClientDTO cl = clientsRepository.findById(id).get();
-        if (fullName != null)
-            cl.setFullName(fullName);
-        if (type != null)
-            cl.setType(ClientDTO.ClientType.values()[type.ordinal()]);
-        return ClientMapper.INSTANCE.toDto(clientsRepository.save(cl));
+        try {
+            ClientDTO cl = clientsRepository.findById(id).get();
+            if (fullName != null)
+                cl.setFullName(fullName);
+            if (type != null)
+                cl.setType(ClientDTO.ClientType.values()[type.ordinal()]);
+            return ClientMapper.INSTANCE.toDto(clientsRepository.save(cl));
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(Client.class);
+        }
     }
 
-    public Collection<Contract> getClientsContracts(long id)  {
-        ClientDTO cl = clientsRepository.findById(id).get();
-        return ContractMapper.INSTANCE.toDto(cl.getContracts());
+    public Collection<Contract> getClientsContracts(long id) {
+        try {
+            ClientDTO cl = clientsRepository.findById(id).get();
+            return ContractMapper.INSTANCE.toDto(cl.getContracts());
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(Client.class);
+        }
     }
 
     public void delete(long id) {
-        clientsRepository.deleteById(id);
+        try {
+            clientsRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new NotFoundException(Client.class);
+        }
     }
 
     public Collection<Client> findByName(String name) {

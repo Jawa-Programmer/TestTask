@@ -5,18 +5,19 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.services.PhoneNumbersService;
 import ru.jawaprog.test_task.web.entities.Account;
 import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
 
+@Log4j2
 @Api(value = "База номеров телефоном МТС", description = "RESTful сервис взаимодействия с БД номеров МТС")
 @RestController
 @RequestMapping("phone-numbers")
@@ -24,14 +25,9 @@ public class PhoneNumbersController {
     @Autowired
     private PhoneNumbersService phoneNumbersService;
 
-    @ExceptionHandler(value = {NoSuchElementException.class, EmptyResultDataAccessException.class})
-    protected ResponseEntity<Object> handleNotFound() {
-        return new ResponseEntity<>("Телефонный номер с переданным id не найден", HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(value = {IllegalArgumentException.class})
-    protected ResponseEntity<Object> handleConflict() {
-        return new ResponseEntity<>("Нарушение ограничения внешнего ключа: лицевой счёт с переданным accountId не найден", HttpStatus.UNPROCESSABLE_ENTITY);
+    private <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
+        log.info("Request: " + request + "; Response: " + response);
+        return response;
     }
 
     @ApiResponses(value = {
@@ -39,18 +35,19 @@ public class PhoneNumbersController {
     })
     @GetMapping(path = "/{id}")
     public ResponseEntity<PhoneNumber> getPhoneNumber(
+            WebRequest request,
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id
     ) {
         PhoneNumber phoneNumber = phoneNumbersService.get(id);
-        return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
+        return logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.OK), request);
     }
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping
-    public ResponseEntity<Collection<PhoneNumber>> getPhoneNumbers() {
-        return new ResponseEntity<>(phoneNumbersService.findAll(), HttpStatus.OK);
+    public ResponseEntity<Collection<PhoneNumber>> getPhoneNumbers(WebRequest request) {
+        return logAndSend(new ResponseEntity<>(phoneNumbersService.findAll(), HttpStatus.OK), request);
     }
 
     @ApiResponses(value = {
@@ -59,6 +56,7 @@ public class PhoneNumbersController {
     })
     @PostMapping
     public ResponseEntity<PhoneNumber> postPhoneNumber(
+            WebRequest request,
             @ApiParam(value = "Номер телефона", required = true) @RequestParam(value = "number") String number,
             @ApiParam(value = "id лицевого счёта. Внешний ключ", required = true) @RequestParam(value = "accountId") long accountId
     ) {
@@ -70,7 +68,7 @@ public class PhoneNumbersController {
         phoneNumber.setNumber(number);
         phoneNumber = phoneNumbersService.saveNew(phoneNumber);
 
-        return new ResponseEntity<>(phoneNumber, HttpStatus.CREATED);
+        return logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.CREATED), request);
     }
 
     @ApiResponses(value = {
@@ -80,13 +78,14 @@ public class PhoneNumbersController {
     })
     @PutMapping(path = "/{id}")
     public ResponseEntity<PhoneNumber> putPhoneNumber(
+            WebRequest request,
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id,
             @ApiParam(value = "Номер телефона") @RequestParam(value = "number", required = false) String number,
             @ApiParam(value = "id лицевого счёта. Внешний ключ") @RequestParam(value = "accountId", required = false) Long accountId
     ) {
         PhoneNumber phoneNumber;
         phoneNumber = phoneNumbersService.update(id, number, accountId);
-        return new ResponseEntity<>(phoneNumber, HttpStatus.OK);
+        return logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.OK), request);
     }
 
     @ApiResponses(value = {
@@ -95,10 +94,10 @@ public class PhoneNumbersController {
     })
     @DeleteMapping(path = "/{id}")
     public ResponseEntity deletePhoneNumber(
+            WebRequest request,
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id
     ) {
         phoneNumbersService.delete(id);
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-
+        return logAndSend(new ResponseEntity(HttpStatus.NO_CONTENT), request);
     }
 }

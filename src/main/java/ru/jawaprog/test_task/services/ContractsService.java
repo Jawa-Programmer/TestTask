@@ -1,17 +1,22 @@
 package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
 import ru.jawaprog.test_task.dao.entities.ContractDTO;
+import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
 import ru.jawaprog.test_task.services.mappers.AccountMapper;
 import ru.jawaprog.test_task.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.entities.Account;
+import ru.jawaprog.test_task.web.entities.Client;
 import ru.jawaprog.test_task.web.entities.Contract;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ContractsService {
@@ -30,7 +35,11 @@ public class ContractsService {
     }
 
     public Contract get(long id) {
-        return ContractMapper.INSTANCE.toDto(contractsRepository.findById(id).get());
+        try {
+            return ContractMapper.INSTANCE.toDto(contractsRepository.findById(id).get());
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(Contract.class);
+        }
     }
 
     ContractDTO getDAO(long id) {
@@ -39,7 +48,7 @@ public class ContractsService {
 
     public Contract saveNew(Contract c) {
         ClientDTO cl = clientsService.getDAO(c.getClient().getId());
-        if (cl == null) throw new IllegalArgumentException();
+        if (cl == null) throw new ForeignKeyException(Client.class);
         ContractDTO ct = new ContractDTO();
         ct.setClient(cl);
         ct.setNumber(c.getNumber());
@@ -47,22 +56,34 @@ public class ContractsService {
     }
 
     public Contract update(long id, Long number, Long clientId) {
-        ContractDTO ctr = contractsRepository.findById(id).get();
-        if (number != null) ctr.setNumber(number);
-        if (clientId != null) {
-            ClientDTO cl = clientsService.getDAO(clientId);
-            if (cl == null) throw new IllegalArgumentException();
-            ctr.setClient(cl);
+        try {
+            ContractDTO ctr = contractsRepository.findById(id).get();
+            if (number != null) ctr.setNumber(number);
+            if (clientId != null) {
+                ClientDTO cl = clientsService.getDAO(clientId);
+                if (cl == null) throw new ForeignKeyException(Client.class);
+                ctr.setClient(cl);
+            }
+            return ContractMapper.INSTANCE.toDto(contractsRepository.save(ctr));
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(Contract.class);
         }
-        return ContractMapper.INSTANCE.toDto(contractsRepository.save(ctr));
     }
 
     public void delete(long id) {
-        contractsRepository.deleteById(id);
+        try {
+            contractsRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new NotFoundException(Contract.class);
+        }
     }
 
     public Collection<Account> getContractsAccounts(long id) {
-        ContractDTO contractDTO = contractsRepository.findById(id).get();
-        return AccountMapper.INSTANCE.toDto(contractDTO.getAccounts());
+        try {
+            ContractDTO contractDTO = contractsRepository.findById(id).get();
+            return AccountMapper.INSTANCE.toDto(contractDTO.getAccounts());
+        } catch (NoSuchElementException ex) {
+            throw new NotFoundException(Contract.class);
+        }
     }
 }
