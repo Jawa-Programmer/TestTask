@@ -2,8 +2,6 @@ package ru.jawaprog.test_task.web.controllers;
 
 
 import io.swagger.annotations.*;
-import lombok.extern.java.Log;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +14,17 @@ import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
 
-@Log4j2
+import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+
 @Api(value = "База лицевых счетов МТС", description = "RESTful сервис взаимодействия с БД счетов МТС")
 @RestController
 @RequestMapping("accounts")
 public class AccountController {
-    @Autowired
-    private AccountsService accountsService;
+    private final AccountsService accountsService;
 
-    private <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
-        log.info("Request: " + request + "; Response: " + response);
-        return response;
+    @Autowired
+    public AccountController(AccountsService accountsService) {
+        this.accountsService = accountsService;
     }
 
     @ApiOperation(value = "Получить лицевой счет по id")

@@ -9,32 +9,37 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
-import ru.jawaprog.test_task.web.entities.*;
+import ru.jawaprog.test_task.web.entities.Account;
+import ru.jawaprog.test_task.web.entities.Client;
+import ru.jawaprog.test_task.web.entities.Contract;
+import ru.jawaprog.test_task.web.entities.ErrorInfo;
 
-import java.util.HashMap;
+import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
 
 @Log4j2
 @ControllerAdvice
 public class ExceptionHandlerController {
-    static private final HashMap<Class, String> classNames = new HashMap<>();
+    private enum EntityType {
+        CLIENT("Клиент"), CONTRACT("Контракт"), ACCOUNT("Лицевой счёт"), PHONE_NUMBER("Номер Телефона");
+        final String name;
 
-    static {
-        classNames.put(Contract.class, "Контракт");
-        classNames.put(Client.class, "Клиент");
-        classNames.put(Account.class, "Лицевой счёт");
-        classNames.put(PhoneNumber.class, "Номер Телефона");
-    }
+        EntityType(String nm) {
+            name = nm;
+        }
 
-    private <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
-        log.info("Request: " + request + "; Response: " + response);
-        return response;
+        public static EntityType fromClass(Class cls) {
+            if (cls == Client.class) return CLIENT;
+            else if (cls == Contract.class) return CONTRACT;
+            else if (cls == Account.class) return ACCOUNT;
+            else return PHONE_NUMBER;
+        }
     }
 
     @ExceptionHandler(value = {NotFoundException.class})
     protected ResponseEntity<ErrorInfo> handleNotFound(NotFoundException exception, WebRequest request) {
         return logAndSend(new ResponseEntity<>(
                 new ErrorInfo(HttpStatus.NOT_FOUND.value(),
-                        classNames.get(exception.getEntityClass()) + " с переданным id не найден"),
+                        EntityType.fromClass(exception.getEntityClass()).name + " с переданным id не найден"),
                 HttpStatus.NOT_FOUND
         ), request);
     }
@@ -43,7 +48,7 @@ public class ExceptionHandlerController {
     protected ResponseEntity<ErrorInfo> handleConflict(ForeignKeyException exception, WebRequest request) {
         return logAndSend(new ResponseEntity<>(new ErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 "Нарушение ограничения внешнего ключа: " +
-                        classNames.get(exception.getEntityClass()) +
+                        EntityType.fromClass(exception.getEntityClass()).name +
                         " с переданным id не найден"),
                 HttpStatus.UNPROCESSABLE_ENTITY
         ), request);

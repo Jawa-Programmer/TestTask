@@ -1,29 +1,31 @@
 package ru.jawaprog.test_task.web.controllers;
 
 import io.swagger.annotations.*;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.web.entities.Client;
 import ru.jawaprog.test_task.web.entities.Contract;
 
+import javax.validation.constraints.Min;
 import java.util.Collection;
 
-@Log4j2
+import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+
 @Api(value = "База клиентов МТС", description = "RESTful сервис взаимодействия с БД клиентов МТС")
+@Validated
 @RestController
 @RequestMapping("clients")
 public class ClientsController {
-    @Autowired
-    private ClientsService clientsService;
+    final private ClientsService clientsService;
 
-    private <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
-        log.info("Request: " + request + "; Response: " + response);
-        return response;
+    @Autowired
+    public ClientsController(ClientsService clientsService) {
+        this.clientsService = clientsService;
     }
 
     @ApiOperation(value = "Получить клиента по id")
@@ -34,13 +36,13 @@ public class ClientsController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Client> getClient(
             WebRequest request,
-            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
+            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @Min(value = 1) @PathVariable long id
     ) {
         Client c = clientsService.get(id);
         return logAndSend(new ResponseEntity<>(c, HttpStatus.OK), request);
     }
 
-    @ApiOperation(value = "Получить список контрактов пользователя с данным id")
+    @ApiOperation(value = "Получить список контрактов клиента с данным id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешно"),
             @ApiResponse(code = 404, message = "Клиент не найден")

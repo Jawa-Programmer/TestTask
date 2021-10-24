@@ -2,10 +2,10 @@ package ru.jawaprog.test_task.web.controllers;
 
 
 import io.swagger.annotations.*;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.services.ContractsService;
@@ -13,21 +13,19 @@ import ru.jawaprog.test_task.web.entities.Account;
 import ru.jawaprog.test_task.web.entities.Client;
 import ru.jawaprog.test_task.web.entities.Contract;
 
+import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.List;
 
-@Log4j2
+import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+
 @Api(value = "База контрактов МТС", description = "RESTful сервис взаимодействия с БД контрактов МТС")
+@Validated
 @RestController
 @RequestMapping("contracts")
 public class ContractsController {
     @Autowired
     private ContractsService contractsService;
-
-    private <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
-        log.info("Request: " + request + "; Response: " + response);
-        return response;
-    }
 
     @ApiOperation(value = "Получить контракт по id")
     @ApiResponses(value = {
@@ -36,7 +34,7 @@ public class ContractsController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Contract> getContract(
             WebRequest request,
-            @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id
+            @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @Min(value = 1) @PathVariable long id
     ) {
         Contract c = contractsService.get(id);
         return logAndSend(new ResponseEntity<>(c, HttpStatus.OK), request);

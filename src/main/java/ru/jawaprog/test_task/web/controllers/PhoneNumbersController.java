@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +16,14 @@ import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
 
-@Log4j2
+import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+
 @Api(value = "База номеров телефоном МТС", description = "RESTful сервис взаимодействия с БД номеров МТС")
 @RestController
 @RequestMapping("phone-numbers")
 public class PhoneNumbersController {
     @Autowired
     private PhoneNumbersService phoneNumbersService;
-
-    private <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
-        log.info("Request: " + request + "; Response: " + response);
-        return response;
-    }
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Успешно")
