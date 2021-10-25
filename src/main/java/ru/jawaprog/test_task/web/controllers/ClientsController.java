@@ -10,11 +10,15 @@ import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.web.entities.Client;
 import ru.jawaprog.test_task.web.entities.Contract;
+import ru.jawaprog.test_task.web.exceptions.InvalidParamsException;
 
-import javax.validation.constraints.Min;
+import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 
-import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.validateId;
 
 @Api(value = "База клиентов МТС", description = "RESTful сервис взаимодействия с БД клиентов МТС")
 @Validated
@@ -36,8 +40,9 @@ public class ClientsController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Client> getClient(
             WebRequest request,
-            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @Min(value = 1) @PathVariable long id
+            @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         Client c = clientsService.get(id);
         return logAndSend(new ResponseEntity<>(c, HttpStatus.OK), request);
     }
@@ -52,6 +57,7 @@ public class ClientsController {
             WebRequest request,
             @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         return logAndSend(new ResponseEntity<>(clientsService.getClientsContracts(id), HttpStatus.OK), request);
     }
 
@@ -95,7 +101,7 @@ public class ClientsController {
     @PostMapping
     public ResponseEntity<Client> postClient(
             WebRequest request,
-            @ApiParam(value = "Имя физ. лица или наименование организации", required = true) @RequestParam(value = "fullName") String fullName,
+            @ApiParam(value = "Имя физ. лица или наименование организации", required = true) @NotBlank @Size(min = 3) @RequestParam(value = "fullName") String fullName,
             @ApiParam(value = "Тип клиента", required = true) @RequestParam(value = "type") Client.ClientType type
     ) {
         Client client = new Client();
@@ -112,9 +118,12 @@ public class ClientsController {
     public ResponseEntity<Client> updateClient(
             WebRequest request,
             @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id,
-            @ApiParam(value = "Имя физ. лица или наименование организации") @RequestParam(value = "fullName", required = false) String fullName,
+            @ApiParam(value = "Имя физ. лица или наименование организации") @Size(min = 3) @RequestParam(value = "fullName", required = false) String fullName,
             @ApiParam(value = "Тип клиента") @RequestParam(value = "type", required = false) Client.ClientType type
     ) {
+        validateId(id);
+        if (fullName != null && fullName.isBlank()) // пока так, ведь @NotBlank бракует null строки, хотя мне нужно их пропускать дальше
+            throw new InvalidParamsException("updateClient.fullName: не должно быть пустым");
         Client client = clientsService.update(id, fullName, type);
         return logAndSend(new ResponseEntity<>(client, HttpStatus.OK), request);
     }
@@ -129,6 +138,7 @@ public class ClientsController {
             WebRequest request,
             @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         clientsService.delete(id);
         return logAndSend(new ResponseEntity<>(HttpStatus.NO_CONTENT), request);
     }

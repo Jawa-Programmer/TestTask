@@ -13,4 +13,9 @@ public class ErrorInfo {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
+
+    @Override
+    public String toString() {
+        return "Error{code=" + errorCode + "; message=\"" + errorMessage + "\";}";
+    }
 }

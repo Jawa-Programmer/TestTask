@@ -14,7 +14,7 @@ import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
 import java.util.Collection;
 
-import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.logAndSend;
 
 @Api(value = "База лицевых счетов МТС", description = "RESTful сервис взаимодействия с БД счетов МТС")
 @RestController

@@ -17,7 +17,7 @@ import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.List;
 
-import static ru.jawaprog.test_task.web.utils.Logger.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.logAndSend;
 
 @Api(value = "База контрактов МТС", description = "RESTful сервис взаимодействия с БД контрактов МТС")
 @Validated
