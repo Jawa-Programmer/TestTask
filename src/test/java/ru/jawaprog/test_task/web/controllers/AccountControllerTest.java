@@ -1,155 +1,208 @@
 package ru.jawaprog.test_task.web.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.mockito.Mock;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.services.AccountsService;
+import ru.jawaprog.test_task.services.ClientsService;
+import ru.jawaprog.test_task.services.ContractsService;
+import ru.jawaprog.test_task.services.PhoneNumbersService;
 import ru.jawaprog.test_task.web.entities.Account;
-import ru.jawaprog.test_task.web.entities.Contract;
 import ru.jawaprog.test_task.web.entities.PhoneNumber;
+import ru.jawaprog.test_task.web.exceptions.InvalidParamsException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WebMvcTest
 class AccountControllerTest {
-    private static final String BASE_PATH = "http://localhost:8080/accounts/";
 
-    private AccountController subject;
-    @Mock
+    private static final String BASE_PATH = "/accounts";
+
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
     private AccountsService service;
 
+    // бины дальше созданы потому что без них тест не запускается, хотя по факту они нигде не используются в тесте
+    @MockBean
+    private ClientsService clientsService;
+    @MockBean
+    private ContractsService contractsService;
+    @MockBean
+    private PhoneNumbersService phoneNumbersService;
+
+    Collection<Account> database;
+
     @BeforeAll
-    void setUp() {
-        initMocks(this);
-        subject = new AccountController(service);
-    }
-
-    @Test
-    void getAccount() {
+    void initial() {
+        database = new HashSet<>();
         {
-            Account acc = new Account();
-            acc.setId(1);
-            acc.setNumber(89);
-            given(service.get(1)).willReturn(acc);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("GET", BASE_PATH + 1));
-            ResponseEntity<Account> resp = subject.getAccount(req, 1);
-            assertEquals(HttpStatus.OK, resp.getStatusCode());
-            assertEquals(acc, resp.getBody());
+            Account c = new Account();
+            c.setId(1);
+            c.setNumber(8800);
+            database.add(c);
         }
         {
-            given(service.get(anyLong())).willThrow(NotFoundException.class);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("GET", BASE_PATH + 1));
-            assertThrows(NotFoundException.class, () -> subject.getAccount(req, 1));
+            Account c = new Account();
+            c.setId(2);
+            c.setNumber(84112);
+            database.add(c);
         }
     }
 
-    @Test
-    void getAccounts() {
-        Collection<Account> database = new HashSet<>();
-
-        given(service.findAll()).willReturn(database);
-        WebRequest req = new ServletWebRequest(new MockHttpServletRequest("GET", BASE_PATH));
-        ResponseEntity<Collection<Account>> resp = subject.getAccounts(req);
-        assertEquals(HttpStatus.OK, resp.getStatusCode());
-        assertEquals(database, resp.getBody());
+    @AfterAll
+    void cleanup() {
+        database.clear();
     }
 
     @Test
-    void getPhones() {
+    void getAccount() throws Exception {
         {
-            Collection<PhoneNumber> phones = new LinkedList<>();
-            given(service.getAccountsPhones(1)).willReturn(phones);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("GET", BASE_PATH + "1/phones"));
-            ResponseEntity<Collection<PhoneNumber>> resp = subject.getAccountPhones(req, 1);
-            assertEquals(HttpStatus.OK, resp.getStatusCode());
-            assertEquals(phones, resp.getBody());
+            Account acc = database.stream().findFirst().get();
+            Mockito.when(service.get(1)).thenReturn(acc);
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", 1))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
         }
         {
-            given(service.getAccountsPhones(anyLong())).willThrow(NotFoundException.class);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("GET", BASE_PATH + "1/phones"));
-            assertThrows(NotFoundException.class, () -> subject.getAccountPhones(req, 1));
+            Mockito.when(service.get(anyLong())).thenThrow(NotFoundException.class);
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", 1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
+        }
+        {
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", -1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
         }
     }
 
     @Test
-    void postAccount() {
+    void getAccountPhones() throws Exception {
         {
-            Account acc = new Account();
-            acc.setNumber(123);
-            acc.setContract(new Contract());
-            acc.getContract().setId(1);
-            given(service.saveNew(any(Account.class))).willReturn(acc);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("POST", BASE_PATH));
-            ResponseEntity<Account> resp = subject.postAccount(req, 123, 1);
-            assertEquals(HttpStatus.CREATED, resp.getStatusCode());
-            assertEquals(acc, resp.getBody());
+            Collection<PhoneNumber> database = new HashSet<>();
+
+            Mockito.when(service.getAccountsPhones(1)).thenReturn(database);
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{1}/phones", 1))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
         }
         {
-            Account acc = new Account();
-            acc.setNumber(123);
-            acc.setContract(new Contract());
-            acc.getContract().setId(1);
-            given(service.saveNew(any(Account.class))).willThrow(ForeignKeyException.class);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("POST", BASE_PATH));
-            assertThrows(ForeignKeyException.class, () -> subject.postAccount(req, 123, 1));
+            Mockito.when(service.getAccountsPhones(1)).thenThrow(NotFoundException.class);
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}/phones", 1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}/phones", -1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
         }
     }
 
     @Test
-    void putAccount() {
-        Account acc = new Account();
-        acc.setId(2);
-        acc.setNumber(123);
-        acc.setContract(new Contract());
-        acc.getContract().setId(1);
+    void getAccounts() throws Exception {
+        Mockito.when(service.findAll()).thenReturn(database);
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
+    }
+
+    @Test
+    void postAccount() throws Exception {
         {
-            given(service.update(1, 123, 1L)).willReturn(acc);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("PUT", BASE_PATH + 1));
-            ResponseEntity<Account> resp = subject.putAccount(req, 1, 123, 1L);
-            assertEquals(HttpStatus.OK, resp.getStatusCode());
-            assertEquals(acc, resp.getBody());
+            Account acc = database.stream().findFirst().get();
+
+            Mockito.when(service.saveNew(any(Account.class))).thenReturn(acc);
+            mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
+                            .param("number", "880332")
+                            .param("contractId", "1"))
+                    .andExpect(MockMvcResultMatchers.status().isCreated())
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
         }
         {
-            given(service.update(2, 123, 1L)).willThrow(ForeignKeyException.class);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("PUT", BASE_PATH + 2));
-            assertThrows(ForeignKeyException.class, () -> subject.putAccount(req, 2, 123, 1L));
-        }
-        {
-            given(service.update(4, 123, 1L)).willThrow(NotFoundException.class);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("PUT", BASE_PATH + 4));
-            assertThrows(NotFoundException.class, () -> subject.putAccount(req, 4, 123, 1L));
+            Mockito.when(service.saveNew(any(Account.class))).thenThrow(ForeignKeyException.class);
+            mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH, 1)
+                            .param("contractId", "1")
+                            .param("number", "231"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ForeignKeyException.class));
+
+            mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
+                            .param("contractId", "-1")
+                            .param("number", "231"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ConstraintViolationException.class));
+            mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
+                            .param("contractId", "fderwe")
+                            .param("number", "INL"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MethodArgumentTypeMismatchException.class));
+            mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MissingServletRequestParameterException.class));
         }
     }
 
     @Test
-    void deleteAccount() {
+    void putAccount() throws Exception {
         {
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("DELETE", BASE_PATH + 1));
-            ResponseEntity resp = subject.deleteAccount(req, 1);
-            assertEquals(HttpStatus.NO_CONTENT, resp.getStatusCode());
+            Account acc = database.stream().findFirst().get();
+            Mockito.when(service.update(1, null, 1L)).thenReturn(acc);
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+                            .param("contractId", "1"))
+                    .andExpect(MockMvcResultMatchers.status().isOk())
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
         }
         {
-            doThrow(NotFoundException.class).when(service).delete(1);
-            WebRequest req = new ServletWebRequest(new MockHttpServletRequest("DELETE", BASE_PATH + 1));
-            assertThrows(NotFoundException.class, () -> subject.deleteAccount(req, 1));
+            Mockito.when(service.update(1, null, 1L)).thenThrow(NotFoundException.class);
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+                            .param("contractId", "1"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
+
+            Mockito.when(service.update(1, null, 2L)).thenThrow(ForeignKeyException.class);
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+                            .param("contractId", "2"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ForeignKeyException.class));
+
+
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", -55)
+                            .param("number", "123"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
+
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 23)
+                            .param("contractId", "-1"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ConstraintViolationException.class));
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+                            .param("number", "ajc"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MethodArgumentTypeMismatchException.class));
+        }
+    }
+
+    @Test
+    void deleteAccount() throws Exception {
+        {
+            Mockito.doNothing().when(service).delete(1);
+            mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", 1))
+                    .andExpect(MockMvcResultMatchers.status().isNoContent());
+        }
+        {
+            Mockito.doThrow(NotFoundException.class).when(service).delete(1);
+            mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", 1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
+            mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", -1))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
         }
     }
 }

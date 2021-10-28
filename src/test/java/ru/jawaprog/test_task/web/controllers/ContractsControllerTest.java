@@ -14,11 +14,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.services.AccountsService;
 import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.services.ContractsService;
 import ru.jawaprog.test_task.services.PhoneNumbersService;
+import ru.jawaprog.test_task.web.entities.Account;
 import ru.jawaprog.test_task.web.entities.Client;
 import ru.jawaprog.test_task.web.entities.Contract;
 import ru.jawaprog.test_task.web.exceptions.InvalidParamsException;
@@ -27,49 +29,53 @@ import javax.validation.ConstraintViolationException;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
-class ClientsControllerTest {
+class ContractsControllerTest {
 
-
-    private static final String BASE_PATH = "/clients";
+    private static final String BASE_PATH = "/contracts";
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private ClientsService service;
+    private ContractsService service;
 
     // бины дальше созданы потому что без них тест не запускается, хотя по факту они нигде не используются в тесте
     @MockBean
-    private AccountsService accountsService;
+    private ClientsService clientsService;
     @MockBean
-    private ContractsService contractsService;
+    private AccountsService accountsService;
     @MockBean
     private PhoneNumbersService phoneNumbersService;
 
-    Collection<Client> database;
+    Collection<Contract> database;
 
     @BeforeAll
     void initial() {
         database = new HashSet<>();
+        Client cl = new Client();
+        cl.setFullName("ОАО \"Общество огромных растений\"");
+        cl.setId(1);
+        cl.setType(Client.ClientType.ENTITY);
         {
-            Client cl = new Client();
-            cl.setFullName("Зубенко Михаил Петрович");
-            cl.setId(1);
-            cl.setType(Client.ClientType.INDIVIDUAL);
-            database.add(cl);
+            Contract c = new Contract();
+            c.setId(1);
+            c.setNumber(8800);
+            c.setClient(cl);
+            database.add(c);
         }
         {
-            Client cl = new Client();
-            cl.setFullName("ИП Иванова");
-            cl.setId(2);
-            cl.setType(Client.ClientType.ENTITY);
-            database.add(cl);
+            Contract c = new Contract();
+            c.setId(2);
+            c.setNumber(84112);
+            c.setClient(cl);
+            database.add(c);
         }
     }
 
@@ -79,19 +85,9 @@ class ClientsControllerTest {
     }
 
     @Test
-    void getClients() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(database);
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
-    }
-
-
-    @Test
-    void getClient() throws Exception {
+    void getContract() throws Exception {
         {
-            Client acc = database.stream().findFirst().get();
-
+            Contract acc = database.stream().findFirst().get();
             Mockito.when(service.get(1)).thenReturn(acc);
             mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", 1))
                     .andExpect(MockMvcResultMatchers.status().isOk())
@@ -109,63 +105,58 @@ class ClientsControllerTest {
     }
 
     @Test
-    void getClientsContracts() throws Exception {
+    void getContractAccounts() throws Exception {
         {
-            Collection<Contract> database = new HashSet<>();
+            Collection<Account> database = new HashSet<>();
 
-            Mockito.when(service.getClientsContracts(1)).thenReturn(database);
-            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{1}/contracts", 1))
+            Mockito.when(service.getContractsAccounts(1)).thenReturn(database);
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{1}/accounts", 1))
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
         }
         {
-            Mockito.when(service.getClientsContracts(1)).thenThrow(NotFoundException.class);
-            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}/contracts", 1))
+            Mockito.when(service.getContractsAccounts(1)).thenThrow(NotFoundException.class);
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}/accounts", 1))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
-            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}/contracts", -1))
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}/accounts", -1))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
         }
     }
 
     @Test
-    void findClients() throws Exception {
-        String name = "Zubenco"; // mockMvc не может в кириллицу. приходится обходить недостаток
-        Mockito.when(service.findByName(name)).thenReturn(database);
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/findByName/{name}", name))
+    void getContracts() throws Exception {
+        Mockito.when(service.findAll()).thenReturn(database);
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
     }
 
     @Test
-    void findClientsByNumber() throws Exception {
-
-        Mockito.when(service.findByPhoneNumber("+7 (800) 555-35-35")).thenReturn(database);
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/findByPhoneNumber/{number}", "+7 (800) 555-35-35"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
-    }
-
-
-    @Test
-    void postClient() throws Exception {
+    void postContract() throws Exception {
         {
-            Client acc = database.stream().findFirst().get();
+            Contract acc = database.stream().findFirst().get();
 
-            Mockito.when(service.saveNew(any(Client.class))).thenReturn(acc);
+            Mockito.when(service.saveNew(any(Contract.class))).thenReturn(acc);
             mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
-                            .param("fullName", "Зубенко Михаил Петрович")
-                            .param("type", "INDIVIDUAL"))
+                            .param("number", "880332")
+                            .param("clientId", "1"))
                     .andExpect(MockMvcResultMatchers.status().isCreated())
                     .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
         }
         {
+            Mockito.when(service.saveNew(any(Contract.class))).thenThrow(ForeignKeyException.class);
+            mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH, 1)
+                            .param("clientId", "1")
+                            .param("number", "231"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ForeignKeyException.class));
+
             mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
-                            .param("fullName", "Зу")
-                            .param("type", "INDIVIDUAL"))
+                            .param("clientId", "-1")
+                            .param("number", "231"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ConstraintViolationException.class));
             mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
-                            .param("fullName", "Зубенко Михаил Петрович")
-                            .param("type", "INDEVIDUAL"))
+                            .param("clientId", "fderwe")
+                            .param("type", "INL"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MethodArgumentTypeMismatchException.class));
             mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MissingServletRequestParameterException.class));
@@ -173,34 +164,41 @@ class ClientsControllerTest {
     }
 
     @Test
-    void updateClient() throws Exception {
+    void putContract() throws Exception {
         {
-            Client acc = database.stream().findFirst().get();
-            Mockito.when(service.update(1, null, Client.ClientType.INDIVIDUAL)).thenReturn(acc);
+            Contract acc = database.stream().findFirst().get();
+            Mockito.when(service.update(1, null, 1L)).thenReturn(acc);
             mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
-                            .param("type", "INDIVIDUAL"))
+                            .param("clientId", "1"))
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
         }
         {
-            Mockito.when(service.update(1, null, Client.ClientType.ENTITY)).thenThrow(NotFoundException.class);
+            Mockito.when(service.update(1, null, 1L)).thenThrow(NotFoundException.class);
             mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
-                            .param("type", "ENTITY"))
+                            .param("clientId", "1"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
+
+            Mockito.when(service.update(1, null, 2L)).thenThrow(ForeignKeyException.class);
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+                            .param("clientId", "2"))
+                    .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ForeignKeyException.class));
+
+
             mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", -1))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
 
             mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
-                            .param("fullName", "Zu"))
+                            .param("clientId", "-1"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ConstraintViolationException.class));
             mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
-                            .param("type", "INDEVIDUAL"))
+                            .param("number", "ajc"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(MethodArgumentTypeMismatchException.class));
         }
     }
 
     @Test
-    void deleteClient() throws Exception {
+    void deleteContract() throws Exception {
         {
             Mockito.doNothing().when(service).delete(1);
             mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", 1))

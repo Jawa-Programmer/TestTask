@@ -8,18 +8,23 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.services.PhoneNumbersService;
 import ru.jawaprog.test_task.web.entities.Account;
 import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.util.Collection;
 
 import static ru.jawaprog.test_task.web.utils.Utils.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.validateId;
 
 @Api(value = "База номеров телефоном МТС", description = "RESTful сервис взаимодействия с БД номеров МТС")
 @RestController
+@Validated
 @RequestMapping("phone-numbers")
 public class PhoneNumbersController {
     @Autowired
@@ -33,6 +38,7 @@ public class PhoneNumbersController {
             WebRequest request,
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         PhoneNumber phoneNumber = phoneNumbersService.get(id);
         return logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.OK), request);
     }
@@ -52,8 +58,8 @@ public class PhoneNumbersController {
     @PostMapping
     public ResponseEntity<PhoneNumber> postPhoneNumber(
             WebRequest request,
-            @ApiParam(value = "Номер телефона", required = true) @RequestParam(value = "number") String number,
-            @ApiParam(value = "id лицевого счёта. Внешний ключ", required = true) @RequestParam(value = "accountId") long accountId
+            @ApiParam(value = "Номер телефона", required = true) @Pattern(regexp = "\\+7 \\(\\d{3}\\) \\d{3}-\\d{2}-\\d{2}") @RequestParam(value = "number") String number,
+            @ApiParam(value = "id лицевого счёта. Внешний ключ", required = true) @Min(1) @RequestParam(value = "accountId") long accountId
     ) {
         Account account = new Account();
         account.setId(accountId);
@@ -75,9 +81,10 @@ public class PhoneNumbersController {
     public ResponseEntity<PhoneNumber> putPhoneNumber(
             WebRequest request,
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id,
-            @ApiParam(value = "Номер телефона") @RequestParam(value = "number", required = false) String number,
-            @ApiParam(value = "id лицевого счёта. Внешний ключ") @RequestParam(value = "accountId", required = false) Long accountId
+            @ApiParam(value = "Номер телефона") @Pattern(regexp = "\\+7 \\(\\d{3}\\) \\d{3}-\\d{2}-\\d{2}") @RequestParam(value = "number", required = false) String number,
+            @ApiParam(value = "id лицевого счёта. Внешний ключ") @Min(1) @RequestParam(value = "accountId", required = false) Long accountId
     ) {
+        validateId(id);
         PhoneNumber phoneNumber;
         phoneNumber = phoneNumbersService.update(id, number, accountId);
         return logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.OK), request);
@@ -92,6 +99,7 @@ public class PhoneNumbersController {
             WebRequest request,
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         phoneNumbersService.delete(id);
         return logAndSend(new ResponseEntity(HttpStatus.NO_CONTENT), request);
     }

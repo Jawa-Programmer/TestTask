@@ -5,6 +5,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.services.AccountsService;
@@ -12,12 +13,15 @@ import ru.jawaprog.test_task.web.entities.Account;
 import ru.jawaprog.test_task.web.entities.Contract;
 import ru.jawaprog.test_task.web.entities.PhoneNumber;
 
+import javax.validation.constraints.Min;
 import java.util.Collection;
 
 import static ru.jawaprog.test_task.web.utils.Utils.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.validateId;
 
 @Api(value = "База лицевых счетов МТС", description = "RESTful сервис взаимодействия с БД счетов МТС")
 @RestController
+@Validated
 @RequestMapping("accounts")
 public class AccountController {
     private final AccountsService accountsService;
@@ -36,6 +40,7 @@ public class AccountController {
             WebRequest request,
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         Account acc = accountsService.get(id);
         return logAndSend(new ResponseEntity<>(acc, HttpStatus.OK), request);
     }
@@ -49,6 +54,7 @@ public class AccountController {
             WebRequest request,
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         return logAndSend(new ResponseEntity<>(accountsService.getAccountsPhones(id), HttpStatus.OK), request);
     }
 
@@ -69,8 +75,8 @@ public class AccountController {
     @PostMapping
     public ResponseEntity<Account> postAccount(
             WebRequest request,
-            @ApiParam(value = "Номер лицевого счёта", required = true) @RequestParam(value = "number") long number,
-            @ApiParam(value = "Номер контракта. Внешний ключ", required = true) @RequestParam(value = "contractId") long contractId) {
+            @ApiParam(value = "Номер лицевого счёта", required = true) @Min(0) @RequestParam(value = "number") long number,
+            @ApiParam(value = "Номер контракта. Внешний ключ", required = true) @Min(1) @RequestParam(value = "contractId") long contractId) {
         Contract contract = new Contract();
         contract.setId(contractId);
         Account account = new Account();
@@ -90,12 +96,11 @@ public class AccountController {
     public ResponseEntity<Account> putAccount(
             WebRequest request,
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id,
-            @ApiParam(value = "Номер лицевого счёта") @RequestParam(value = "number", required = false) Integer number,
-            @ApiParam(value = "Номер контракта. Внешний ключ") @RequestParam(value = "contractId", required = false) Long contractId
+            @ApiParam(value = "Номер лицевого счёта") @Min(0) @RequestParam(value = "number", required = false) Integer number,
+            @ApiParam(value = "Номер контракта. Внешний ключ") @Min(1) @RequestParam(value = "contractId", required = false) Long contractId
     ) {
-        Account account;
-        account = accountsService.update(id, number, contractId);
-        return logAndSend(new ResponseEntity<>(account, HttpStatus.OK), request);
+        validateId(id);
+        return logAndSend(new ResponseEntity<>(accountsService.update(id, number, contractId), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Удалить лицевой счет по id")
@@ -108,6 +113,7 @@ public class AccountController {
             WebRequest request,
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         accountsService.delete(id);
         return logAndSend(new ResponseEntity(HttpStatus.NO_CONTENT), request);
     }

@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static ru.jawaprog.test_task.web.utils.Utils.logAndSend;
+import static ru.jawaprog.test_task.web.utils.Utils.validateId;
 
 @Api(value = "База контрактов МТС", description = "RESTful сервис взаимодействия с БД контрактов МТС")
 @Validated
@@ -34,8 +35,9 @@ public class ContractsController {
     @GetMapping(path = "/{id}")
     public ResponseEntity<Contract> getContract(
             WebRequest request,
-            @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @Min(value = 1) @PathVariable long id
+            @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         Contract c = contractsService.get(id);
         return logAndSend(new ResponseEntity<>(c, HttpStatus.OK), request);
     }
@@ -50,6 +52,7 @@ public class ContractsController {
             WebRequest request,
             @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         return logAndSend(new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK), request);
     }
 
@@ -58,7 +61,7 @@ public class ContractsController {
             @ApiResponse(code = 200, message = "Успешно")
     })
     @GetMapping
-    public ResponseEntity<List<Contract>> getContracts(WebRequest request) {
+    public ResponseEntity<Collection<Contract>> getContracts(WebRequest request) {
         return new ResponseEntity<>(contractsService.findAll(), HttpStatus.OK);
     }
 
@@ -70,8 +73,8 @@ public class ContractsController {
     @PostMapping
     public ResponseEntity<Contract> postContract(
             WebRequest request,
-            @ApiParam(value = "Номер контракта", required = true) @RequestParam(value = "number") long contractNumber,
-            @ApiParam(value = "id клиента. Внешний ключ", required = true) @RequestParam(value = "clientId") long clientId
+            @ApiParam(value = "Номер контракта", required = true) @Min(0) @RequestParam(value = "number") long contractNumber,
+            @ApiParam(value = "id клиента. Внешний ключ", required = true) @Min(1) @RequestParam(value = "clientId") long clientId
     ) {
         Client client = new Client();
         client.setId(clientId);
@@ -93,9 +96,10 @@ public class ContractsController {
     public ResponseEntity<Contract> putContract(
             WebRequest request,
             @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id,
-            @ApiParam(value = "Номер контракта") @RequestParam(value = "number", required = false) Long contractNumber,
-            @ApiParam(value = "id клиента. Внешний ключ") @RequestParam(value = "clientId", required = false) Long clientId
+            @ApiParam(value = "Номер контракта") @Min(0) @RequestParam(value = "number", required = false) Long contractNumber,
+            @ApiParam(value = "id клиента. Внешний ключ") @Min(1) @RequestParam(value = "clientId", required = false) Long clientId
     ) {
+        validateId(id);
         return logAndSend(new ResponseEntity<>(contractsService.update(id, contractNumber, clientId), HttpStatus.OK), request);
     }
 
@@ -109,6 +113,7 @@ public class ContractsController {
             WebRequest request,
             @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id
     ) {
+        validateId(id);
         contractsService.delete(id);
         return logAndSend(new ResponseEntity(HttpStatus.NO_CONTENT), request);
     }

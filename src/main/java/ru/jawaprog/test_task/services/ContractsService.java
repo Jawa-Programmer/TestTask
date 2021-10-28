@@ -30,8 +30,8 @@ public class ContractsService {
         this.contractsRepository = contractsRepository;
     }
 
-    public List<Contract> findAll() {
-        return (List<Contract>) ContractMapper.INSTANCE.toDto(contractsRepository.findAll());
+    public Collection<Contract> findAll() {
+        return ContractMapper.INSTANCE.toDto(contractsRepository.findAll());
     }
 
     public Contract get(long id) {
