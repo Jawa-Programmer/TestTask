@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
-import ru.jawaprog.test_task.web.rest.services.mappers.ClientMapper;
-import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
+import ru.jawaprog.test_task.web.rest.services.mappers.ClientMapper;
+import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
 
 import java.util.Collection;
 import java.util.HashSet;

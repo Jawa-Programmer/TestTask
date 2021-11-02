@@ -1,6 +1,6 @@
 package ru.jawaprog.test_task.web.soap.services.mappers;
 
-import io.spring.guides.gs_producing_web_service.Client;
+import ru.jawaprog.test_task_mts.Client;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

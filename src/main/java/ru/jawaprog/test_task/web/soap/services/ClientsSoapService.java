@@ -1,7 +1,11 @@
 package ru.jawaprog.test_task.web.soap.services;
 
-import io.spring.guides.gs_producing_web_service.Client;
-import io.spring.guides.gs_producing_web_service.ClientType;
+
+import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
+import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
+import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
+import ru.jawaprog.test_task_mts.Client;
+import ru.jawaprog.test_task_mts.ClientType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -10,17 +14,21 @@ import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapClientMapper;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 
 @Service
 public class ClientsSoapService {
 
     private final ClientsRepository clientsRepository;
+    private final PhoneNumbersRepository phoneNumbersRepository;
 
     @Autowired
-    public ClientsSoapService(ClientsRepository clientsRepository) {
+    public ClientsSoapService(ClientsRepository clientsRepository, PhoneNumbersRepository phoneNumbersRepository) {
         this.clientsRepository = clientsRepository;
+        this.phoneNumbersRepository = phoneNumbersRepository;
     }
 
     public Collection<Client> findAll() {
@@ -36,15 +44,11 @@ public class ClientsSoapService {
         }
     }
 
-    // пакетный модификатор позволит вызывать его только из других сервисов
-    ClientDTO getDAO(long id) {
-        return clientsRepository.findById(id).orElse(null);
-    }
 
-    public Client saveNew(Client client) {
+    public Client saveNew(@NotNull String fullName, @NotNull ClientType type) {
         ClientDTO cl = new ClientDTO();
-        cl.setFullName(client.getFullName());
-        cl.setType(ClientDTO.ClientType.values()[client.getType().ordinal()]);
+        cl.setFullName(fullName);
+        cl.setType(ClientDTO.ClientType.valueOf(type.value()));
         return SoapClientMapper.INSTANCE.fromDto(clientsRepository.save(cl));
     }
 
@@ -73,4 +77,11 @@ public class ClientsSoapService {
         return SoapClientMapper.INSTANCE.fromDto(clientsRepository.findAllByName(name));
     }
 
+    public Collection<Client> findByPhoneNumber(String number) {
+        Collection<PhoneNumberDTO> phones = phoneNumbersRepository.findAllByNumber(number);
+        Collection<Client> ret = new HashSet<>();
+        for (PhoneNumberDTO phone : phones)
+            ret.add(SoapClientMapper.INSTANCE.fromDto(phone.getAccount().getContract().getClient()));
+        return ret;
+    }
 }

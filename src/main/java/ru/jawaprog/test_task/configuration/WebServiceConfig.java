@@ -32,18 +32,18 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         return new ServletRegistrationBean(servlet, "/ws/*");
     }
 
-    @Bean(name = "clients")
+    @Bean(name = "soap-api")
     public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema countriesSchema) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
         wsdl11Definition.setPortTypeName("ClientsPort");
         wsdl11Definition.setLocationUri("/ws");
-        wsdl11Definition.setTargetNamespace("http://spring.io/guides/gs-producing-web-service");
+        wsdl11Definition.setTargetNamespace("http://jawaprog.ru/test-task-mts");
         wsdl11Definition.setSchema(countriesSchema);
         return wsdl11Definition;
     }
 
     @Bean
     public XsdSchema clientsSchema() {
-        return new SimpleXsdSchema(new ClassPathResource("clients.xsd"));
+        return new SimpleXsdSchema(new ClassPathResource("soap-api.xsd"));
     }
 }

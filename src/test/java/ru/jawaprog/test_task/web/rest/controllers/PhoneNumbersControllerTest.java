@@ -16,12 +16,12 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
+import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
+import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
 import ru.jawaprog.test_task.web.rest.services.AccountsService;
 import ru.jawaprog.test_task.web.rest.services.ClientsService;
 import ru.jawaprog.test_task.web.rest.services.ContractsService;
 import ru.jawaprog.test_task.web.rest.services.PhoneNumbersService;
-import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
-import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Collection;

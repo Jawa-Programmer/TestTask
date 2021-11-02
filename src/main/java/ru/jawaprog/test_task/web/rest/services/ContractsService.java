@@ -8,11 +8,11 @@ import ru.jawaprog.test_task.dao.entities.ContractDTO;
 import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
-import ru.jawaprog.test_task.web.rest.services.mappers.AccountMapper;
-import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
+import ru.jawaprog.test_task.web.rest.services.mappers.AccountMapper;
+import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;

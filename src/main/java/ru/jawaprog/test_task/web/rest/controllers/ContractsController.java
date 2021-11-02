@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import ru.jawaprog.test_task.web.rest.services.ContractsService;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
+import ru.jawaprog.test_task.web.rest.services.ContractsService;
 import ru.jawaprog.test_task.web.rest.utils.Utils;
 
 import javax.validation.constraints.Min;

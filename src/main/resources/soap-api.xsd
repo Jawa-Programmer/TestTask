@@ -1,0 +1,121 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://jawaprog.ru/test-task-mts"
+           targetNamespace="http://jawaprog.ru/test-task-mts" elementFormDefault="qualified">
+    <xs:element name="StatusMessage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- секция Client -->
+    <xs:simpleType name="ClientType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ENTITY"/>
+            <xs:enumeration value="INDIVIDUAL"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Client">
+        <xs:attribute name="id" type="xs:long"/>
+        <xs:attribute name="fullName" type="xs:string"/>
+        <xs:attribute name="type" type="tns:ClientType"/>
+    </xs:complexType>
+
+    <xs:element name="getClientsRequest">
+    </xs:element>
+    <xs:element name="ClientsListResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="client" type="tns:Client" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getClientRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ClientResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="client" type="tns:Client"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getClientsContractsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getClientsContractsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="client" type="tns:Contract" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="findClientsByNameRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="findClientsByPhoneRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="number" type="tns:PhoneNumber"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="postClientRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fullName" type="xs:string"/>
+                <xs:element name="type" type="tns:ClientType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="updateClientRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+                <xs:element name="fullName" type="xs:string" minOccurs="0"/>
+                <xs:element name="type" type="tns:ClientType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="deleteClientRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- секция Contract -->
+    <xs:complexType name="Contract">
+        <xs:sequence>
+            <xs:element name="client" type="tns:Client"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:long"/>
+        <xs:attribute name="number" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- секция номеров -->
+    <xs:simpleType name="PhoneNumber">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

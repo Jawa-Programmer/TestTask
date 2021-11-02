@@ -101,6 +101,11 @@
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.andromda.thirdparty.jaxb2_commons</groupId>
+            <artifactId>collection-setter-injector</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -151,8 +156,13 @@
                 </executions>
                 <configuration>
                     <sources>
-                        <source>src/main/resources/clients.xsd</source>
+                        <source>src/main/resources/soap-api.xsd</source>
                     </sources>
+                    <arguments>
+                        <argument>-Xcollection-setter-injector</argument>
+                    </arguments>
+                    <clearOutputDir>false</clearOutputDir>
+                    <extension>true</extension>
                 </configuration>
             </plugin>
 
