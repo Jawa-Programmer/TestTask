@@ -1,18 +1,17 @@
 package ru.jawaprog.test_task.web.soap.services;
 
 
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
-import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
-import ru.jawaprog.test_task_mts.Client;
-import ru.jawaprog.test_task_mts.ClientType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
+import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
 import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
+import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapClientMapper;
+import ru.jawaprog.test_task_mts.Client;
+import ru.jawaprog.test_task_mts.ClientType;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collection;

@@ -11,7 +11,7 @@ import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
 import ru.jawaprog.test_task.web.rest.services.ClientsService;
-import ru.jawaprog.test_task.web.rest.utils.Utils;
+import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

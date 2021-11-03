@@ -6,8 +6,8 @@ import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import ru.jawaprog.test_task_mts.*;
 import ru.jawaprog.test_task.web.soap.services.ClientsSoapService;
+import ru.jawaprog.test_task_mts.*;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class ClientsEndpoint {
     private static final String NAMESPACE_URI = "http://jawaprog.ru/test-task-mts";
 
-    private ClientsSoapService service;
+    final private ClientsSoapService service;
 
     @Autowired
     public ClientsEndpoint(ClientsSoapService service) {
@@ -33,6 +33,7 @@ public class ClientsEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getClientRequest")
     @ResponsePayload
     public ClientResponse getClient(@RequestPayload GetClientRequest request) {
+        System.out.println(request.getId());
         ClientResponse response = new ClientResponse();
         response.setClient(service.get(request.getId()));
         return response;

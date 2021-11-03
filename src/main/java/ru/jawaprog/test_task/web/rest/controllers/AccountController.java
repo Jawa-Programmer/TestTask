@@ -12,7 +12,7 @@ import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
 import ru.jawaprog.test_task.web.rest.services.AccountsService;
-import ru.jawaprog.test_task.web.rest.utils.Utils;
+import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.Min;
 import java.util.Collection;

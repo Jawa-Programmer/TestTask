@@ -14,7 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
 import ru.jawaprog.test_task.web.rest.services.PhoneNumbersService;
-import ru.jawaprog.test_task.web.rest.utils.Utils;
+import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;

@@ -16,7 +16,7 @@ import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.ErrorInfo;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
-import ru.jawaprog.test_task.web.rest.utils.Utils;
+import ru.jawaprog.test_task.web.utils.Utils;
 
 @Log4j2
 @ControllerAdvice

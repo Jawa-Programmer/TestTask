@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.utils;
+package ru.jawaprog.test_task.web.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
