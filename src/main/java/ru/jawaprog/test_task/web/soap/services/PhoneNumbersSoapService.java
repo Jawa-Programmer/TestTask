@@ -5,8 +5,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
+import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapPhoneNumberMapper;
@@ -42,13 +42,13 @@ public class PhoneNumbersSoapService {
         try {
             return SoapPhoneNumberMapper.INSTANCE.fromDto(phoneNumbersRepository.findById(id).get());
         } catch (NoSuchElementException ex) {
-            throw new NotFoundException(PhoneNumber.class);
+            throw new NotFoundException("Номер телефона");
         }
     }
 
     public PhoneNumber saveNew(String number, long accountId) {
         AccountDTO acc = accountsRepository.findById(accountId).orElse(null);
-        if (acc == null) throw new ForeignKeyException(Account.class);
+        if (acc == null) throw new ForeignKeyException("Счёт");
         PhoneNumberDTO toRet = new PhoneNumberDTO();
         toRet.setNumber(number);
         toRet.setAccount(acc);
@@ -61,13 +61,13 @@ public class PhoneNumbersSoapService {
             if (toRet == null) return null;
             if (accountId != null) {
                 AccountDTO acc = accountsRepository.findById(accountId).orElse(null);
-                if (acc == null) throw new ForeignKeyException(Account.class);
+                if (acc == null) throw new ForeignKeyException("Счёт");
                 toRet.setAccount(acc);
             }
             if (number != null) toRet.setNumber(number);
             return SoapPhoneNumberMapper.INSTANCE.fromDto(toRet);
         } catch (NoSuchElementException ex) {
-            throw new NotFoundException(PhoneNumber.class);
+            throw new NotFoundException("Номер телефона");
         }
     }
 
@@ -75,7 +75,7 @@ public class PhoneNumbersSoapService {
         try {
             phoneNumbersRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            throw new NotFoundException(PhoneNumber.class);
+            throw new NotFoundException("Номер телефона");
         }
     }
 }

@@ -5,12 +5,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.entities.ContractDTO;
-import ru.jawaprog.test_task.dao.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
+import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
-import ru.jawaprog.test_task.web.rest.services.mappers.AccountMapper;
-import ru.jawaprog.test_task.web.rest.services.mappers.PhoneNumberMapper;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapAccountMapper;
 import ru.jawaprog.test_task_mts.Account;
 import ru.jawaprog.test_task_mts.Contract;
@@ -37,14 +35,14 @@ public class AccountsSoapService {
         try {
             return SoapAccountMapper.INSTANCE.fromDto(accountsRepository.findById(id).get());
         } catch (NoSuchElementException ex) {
-            throw new NotFoundException(Account.class);
+            throw new NotFoundException("Счёт");
         }
     }
 
 
     public Account saveNew(long number, long contractId) {
         ContractDTO contract = contractsRepository.findById(contractId).orElse(null);
-        if (contract == null) throw new ForeignKeyException(Contract.class);
+        if (contract == null) throw new ForeignKeyException("Контракт");
         AccountDTO newAcc = new AccountDTO();
         newAcc.setContract(contract);
         newAcc.setNumber(number);
@@ -56,13 +54,13 @@ public class AccountsSoapService {
             AccountDTO acc = accountsRepository.findById(id).get();
             if (contractId != null) {
                 ContractDTO ct = contractsRepository.findById(contractId).orElse(null);
-                if (ct == null) throw new ForeignKeyException(Contract.class);
+                if (ct == null) throw new ForeignKeyException("Контракт");
                 acc.setContract(ct);
             }
             if (number != null) acc.setNumber(number);
             return SoapAccountMapper.INSTANCE.fromDto(accountsRepository.save(acc));
         } catch (NoSuchElementException ex) {
-            throw new NotFoundException(Account.class);
+            throw new NotFoundException("Счёт");
         }
     }
 
@@ -70,7 +68,7 @@ public class AccountsSoapService {
         try {
             accountsRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            throw new NotFoundException(Account.class);
+            throw new NotFoundException("Счёт");
         }
     }
 }

@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.dao.exceptions;
+package ru.jawaprog.test_task.web.rest.exceptions;
 
 import lombok.Getter;
 

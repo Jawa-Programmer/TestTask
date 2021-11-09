@@ -6,7 +6,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.exceptions.NotFoundException;
+import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapClientMapper;
@@ -39,7 +40,7 @@ public class ClientsSoapService {
         try {
             return SoapClientMapper.INSTANCE.fromDto(clientsRepository.findById(id).get());
         } catch (NoSuchElementException ex) {
-            throw new NotFoundException(Client.class);
+            throw new NotFoundException("Клиент");
         }
     }
 
@@ -60,7 +61,7 @@ public class ClientsSoapService {
                 cl.setType(ClientDTO.ClientType.values()[type.ordinal()]);
             return SoapClientMapper.INSTANCE.fromDto(clientsRepository.save(cl));
         } catch (NoSuchElementException ex) {
-            throw new NotFoundException(Client.class);
+            throw new NotFoundException("Клиент");
         }
     }
 
@@ -68,7 +69,7 @@ public class ClientsSoapService {
         try {
             clientsRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
-            throw new NotFoundException(Client.class);
+            throw new NotFoundException("Клиент");
         }
     }
 

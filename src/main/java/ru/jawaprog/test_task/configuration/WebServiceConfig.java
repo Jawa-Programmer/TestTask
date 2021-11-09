@@ -7,12 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.config.annotation.EnableWs;
 import org.springframework.ws.config.annotation.WsConfigurerAdapter;
 import org.springframework.ws.server.EndpointInterceptor;
+import org.springframework.ws.soap.server.endpoint.SoapFaultMappingExceptionResolver;
 import org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor;
-import org.springframework.ws.soap.server.endpoint.interceptor.SoapEnvelopeLoggingInterceptor;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
@@ -20,6 +19,7 @@ import org.springframework.xml.xsd.XsdSchema;
 import ru.jawaprog.test_task.web.utils.LogInterceptor;
 
 import java.util.List;
+import java.util.Properties;
 
 @EnableWs
 @EnableWebMvc

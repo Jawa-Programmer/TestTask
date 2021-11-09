@@ -6,7 +6,6 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import ru.jawaprog.test_task.web.soap.services.PhoneNumbersSoapService;
-import ru.jawaprog.test_task.web.utils.Utils;
 import ru.jawaprog.test_task_mts.*;
 
 import java.util.List;
