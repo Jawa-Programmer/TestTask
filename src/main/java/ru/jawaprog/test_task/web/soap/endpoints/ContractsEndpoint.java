@@ -6,6 +6,7 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 import ru.jawaprog.test_task.web.soap.services.ContractsSoapService;
+import ru.jawaprog.test_task.web.utils.Utils;
 import ru.jawaprog.test_task_mts.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class ContractsEndpoint {
     final private ContractsSoapService service;
 
     @Autowired
-    public ContractsEndpoint(ContractsSoapService service) {
+    public ContractsEndpoint(ContractsSoapService service, Utils utils) {
         this.service = service;
     }
 
@@ -27,6 +28,7 @@ public class ContractsEndpoint {
     public ContractsListResponse getContracts() {
         ContractsListResponse response = new ContractsListResponse();
         response.setContract(List.copyOf(service.findAll()));
+
         return response;
     }
 
@@ -35,6 +37,7 @@ public class ContractsEndpoint {
     public ContractResponse getContract(@RequestPayload GetContractRequest request) {
         ContractResponse response = new ContractResponse();
         response.setContract(service.get(request.getId()));
+
         return response;
     }
 

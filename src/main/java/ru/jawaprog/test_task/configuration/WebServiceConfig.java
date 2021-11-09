@@ -7,14 +7,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.config.annotation.EnableWs;
 import org.springframework.ws.config.annotation.WsConfigurerAdapter;
 import org.springframework.ws.server.EndpointInterceptor;
 import org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor;
+import org.springframework.ws.soap.server.endpoint.interceptor.SoapEnvelopeLoggingInterceptor;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
 import org.springframework.xml.xsd.XsdSchema;
+import ru.jawaprog.test_task.web.utils.LogInterceptor;
 
 import java.util.List;
 
@@ -23,13 +26,13 @@ import java.util.List;
 @Configuration
 public class WebServiceConfig extends WsConfigurerAdapter {
 
-        @Bean
-        public DispatcherServletPath dispatcherServletPath() {
-            return () -> "/ws/";
-        }
+    @Bean
+    public DispatcherServletPath dispatcherServletPath() {
+        return () -> "/ws/";
+    }
 
     @Bean
-    public ServletRegistrationBean dispatcherServlet(ApplicationContext applicationContext) {
+    public ServletRegistrationBean dispatcherServlet2(ApplicationContext applicationContext) {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
@@ -48,9 +51,12 @@ public class WebServiceConfig extends WsConfigurerAdapter {
 
     @Override
     public void addInterceptors(List<EndpointInterceptor> interceptors) {
+        LogInterceptor logger = new LogInterceptor();
+        interceptors.add(logger);
+
         PayloadValidatingInterceptor validatingInterceptor = new PayloadValidatingInterceptor();
         validatingInterceptor.setValidateRequest(true);
-        validatingInterceptor.setValidateResponse(true);
+        validatingInterceptor.setSchemaLanguage("ru");
         validatingInterceptor.setXsdSchema(soapApiSchema());
         interceptors.add(validatingInterceptor);
     }
