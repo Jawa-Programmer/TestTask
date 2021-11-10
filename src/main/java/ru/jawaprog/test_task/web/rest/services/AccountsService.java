@@ -23,13 +23,11 @@ import java.util.List;
 @Service
 public class AccountsService {
     private final AccountsRepository accountsRepository;
-    private final ContractsRepository contractsRepository;
     private final PhoneNumbersRepository phoneNumbersRepository;
 
     @Autowired
-    public AccountsService(AccountsRepository accountsRepository, ContractsRepository contractsRepository, PhoneNumbersRepository phoneNumbersRepository) {
+    public AccountsService(AccountsRepository accountsRepository, PhoneNumbersRepository phoneNumbersRepository) {
         this.accountsRepository = accountsRepository;
-        this.contractsRepository = contractsRepository;
         this.phoneNumbersRepository = phoneNumbersRepository;
     }
 

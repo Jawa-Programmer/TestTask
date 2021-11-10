@@ -22,13 +22,11 @@ import java.util.Collection;
 public class ContractsService {
 
     private final ContractsRepository contractsRepository;
-    private final ClientsRepository clientsRepository;
     private final AccountsRepository accountsRepository;
 
     @Autowired
-    public ContractsService(ContractsRepository contractsRepository, ClientsRepository clientsRepository, AccountsRepository accountsRepository) {
+    public ContractsService(ContractsRepository contractsRepository, AccountsRepository accountsRepository) {
         this.contractsRepository = contractsRepository;
-        this.clientsRepository = clientsRepository;
         this.accountsRepository = accountsRepository;
     }
 
@@ -44,7 +42,6 @@ public class ContractsService {
             return ContractMapper.INSTANCE.fromDto(ct);
     }
 
-    //org.springframework.dao.DataIntegrityViolationException
     public Contract saveNew(Contract c) {
         try {
             return ContractMapper.INSTANCE.fromDto(contractsRepository.insert(c.getNumber(), c.getClient().getId()));

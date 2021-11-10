@@ -16,7 +16,7 @@ public interface AccountsRepository {
     })
     List<AccountDTO> findAll();
 
-    @Select("SELECT * FROM accounts WHERE contractId = #{contractId}")
+    @Select("SELECT * FROM accounts WHERE contract_id = #{contractId}")
     @Results({
             @Result(column = "contract_id", property = "contractId")
     })
