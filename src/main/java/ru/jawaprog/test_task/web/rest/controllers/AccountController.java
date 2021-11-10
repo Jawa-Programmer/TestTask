@@ -96,7 +96,7 @@ public class AccountController {
     public ResponseEntity<Account> putAccount(
             WebRequest request,
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id,
-            @ApiParam(value = "Номер лицевого счёта") @Min(0) @RequestParam(value = "number", required = false) Integer number,
+            @ApiParam(value = "Номер лицевого счёта") @Min(0) @RequestParam(value = "number", required = false) Long number,
             @ApiParam(value = "Номер контракта. Внешний ключ") @Min(1) @RequestParam(value = "contractId", required = false) Long contractId
     ) {
         utils.validateId(id);

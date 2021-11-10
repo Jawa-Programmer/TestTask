@@ -14,8 +14,8 @@ public interface PhoneNumberMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "number", target = "number")
-    @Mapping(source = "account", target = "account")
-    PhoneNumber toDto(PhoneNumberDTO client);
+    @Mapping(target = "account", expression = "java(AccountMapper.INSTANCE.fromId(phone.getAccountId()))")
+    PhoneNumber fromDto(PhoneNumberDTO phone);
 
-    Collection<PhoneNumber> toDto(Collection<PhoneNumberDTO> clients);
+    Collection<PhoneNumber> fromDto(Collection<PhoneNumberDTO> phones);
 }

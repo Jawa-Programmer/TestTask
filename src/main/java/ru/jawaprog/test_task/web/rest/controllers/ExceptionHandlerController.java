@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.ErrorInfo;
+import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
+import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 @Log4j2
@@ -51,7 +51,7 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(value = {InvalidParamsException.class})
     protected ResponseEntity<ErrorInfo> handleInvalidParam(InvalidParamsException exception, WebRequest request) {
-        return utils.logAndSend(new ResponseEntity<>(new ErrorInfo(400, exception.getMessage()), HttpStatus.NOT_FOUND), request);
+        return utils.logAndSend(new ResponseEntity<>(new ErrorInfo(400, exception.getMessage()), HttpStatus.BAD_REQUEST), request);
     }
 
     @ExceptionHandler(value = {ForeignKeyException.class})
@@ -84,9 +84,9 @@ public class ExceptionHandlerController {
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<ErrorInfo> handleConflict(Exception exception, WebRequest request) {
         log.catching(exception);
-        return new ResponseEntity<>(new ErrorInfo(500,
+        return utils.logAndSend(new ResponseEntity<>(new ErrorInfo(500,
                 "Внутренняя ошибка сервера"),
                 HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        ), request);
     }
 }

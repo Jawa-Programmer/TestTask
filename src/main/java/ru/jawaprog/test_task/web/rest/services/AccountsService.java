@@ -2,82 +2,76 @@ package ru.jawaprog.test_task.web.rest.services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
-import ru.jawaprog.test_task.dao.entities.ContractDTO;
-import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
+import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
+import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
+import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
+import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.rest.services.mappers.AccountMapper;
 import ru.jawaprog.test_task.web.rest.services.mappers.PhoneNumberMapper;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
+import java.util.List;
 
 @Service
 public class AccountsService {
     private final AccountsRepository accountsRepository;
-    @Autowired
-    private ContractsService contractsService;
+    private final ContractsRepository contractsRepository;
+    private final PhoneNumbersRepository phoneNumbersRepository;
 
-    public AccountsService(AccountsRepository accountsRepository) {
+    @Autowired
+    public AccountsService(AccountsRepository accountsRepository, ContractsRepository contractsRepository, PhoneNumbersRepository phoneNumbersRepository) {
         this.accountsRepository = accountsRepository;
+        this.contractsRepository = contractsRepository;
+        this.phoneNumbersRepository = phoneNumbersRepository;
     }
 
     public Collection<Account> findAll() {
-        return AccountMapper.INSTANCE.toDto(accountsRepository.findAll());
+        return AccountMapper.INSTANCE.fromDto(accountsRepository.findAll());
     }
 
     public Account get(long id) {
-        try {
-            return AccountMapper.INSTANCE.toDto(accountsRepository.findById(id).get());
-        } catch (NoSuchElementException ex) {
-            throw new NotFoundException(Account.class);
-        }
-    }
-
-    AccountDTO getDao(long id) {
-        return accountsRepository.findById(id).orElse(null);
+        AccountDTO acc = accountsRepository.findById(id);
+        if (acc == null) throw new NotFoundException(Account.class);
+        return AccountMapper.INSTANCE.fromDto(acc);
     }
 
     public Account saveNew(Account acc) {
-        ContractDTO contract = contractsService.getDAO(acc.getContract().getId());
-        if (contract == null) throw new ForeignKeyException(Contract.class);
-        AccountDTO newAcc = new AccountDTO();
-        newAcc.setContract(contract);
-        newAcc.setNumber(acc.getNumber());
-        return AccountMapper.INSTANCE.toDto(accountsRepository.save(newAcc));
+        try {
+            return AccountMapper.INSTANCE.fromDto(accountsRepository.insert(acc.getNumber(), acc.getContract().getId()));
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getCause().getMessage().contains("внешнего ключа"))
+                throw new ForeignKeyException(Contract.class);
+        }
+        return null;
     }
 
-    public Account update(long id, Integer number, Long contractId) {
+    public Account update(long id, Long number, Long contractId) {
         try {
-            AccountDTO acc = accountsRepository.findById(id).get();
-            if (contractId != null) {
-                ContractDTO ct = contractsService.getDAO(contractId);
-                if (ct == null) throw new ForeignKeyException(Contract.class);
-                acc.setContract(ct);
-            }
-            if (number != null) acc.setNumber(number);
-            return AccountMapper.INSTANCE.toDto(accountsRepository.save(acc));
-        } catch (NoSuchElementException ex) {
-            throw new NotFoundException(Account.class);
+            AccountDTO acc = accountsRepository.update(id, number, contractId);
+            if (acc == null) throw new NotFoundException(Account.class);
+            return AccountMapper.INSTANCE.fromDto(acc);
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getCause().getMessage().contains("внешнего ключа"))
+                throw new ForeignKeyException(Contract.class);
         }
+        return null;
     }
 
     public void delete(long id) {
-        try {
-            accountsRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException ex) {
+        if (accountsRepository.deleteById(id) == 0)
             throw new NotFoundException(Account.class);
-        }
     }
 
     public Collection<PhoneNumber> getAccountsPhones(long id) {
-        AccountDTO accountDTO = accountsRepository.findById(id).get();
-        return PhoneNumberMapper.INSTANCE.toDto(accountDTO.getPhoneNumbers());
+        List<PhoneNumberDTO> phones = phoneNumbersRepository.findByAccountId(id);
+        return PhoneNumberMapper.INSTANCE.fromDto(phones);
     }
 }

@@ -1,78 +1,70 @@
 package ru.jawaprog.test_task.web.rest.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
+import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
+import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.rest.services.mappers.PhoneNumberMapper;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class PhoneNumbersService {
     final private PhoneNumbersRepository phoneNumbersRepository;
-    @Autowired
-    private AccountsService accountsService;
+    private final AccountsRepository accountsRepository;
 
-    public PhoneNumbersService(PhoneNumbersRepository phoneNumbersRepository) {
+    @Autowired
+    public PhoneNumbersService(PhoneNumbersRepository phoneNumbersRepository, AccountsRepository accountsRepository) {
         this.phoneNumbersRepository = phoneNumbersRepository;
+        this.accountsRepository = accountsRepository;
     }
 
     public Collection<PhoneNumber> findAll() {
         List<PhoneNumberDTO> ret = phoneNumbersRepository.findAll();
-        return PhoneNumberMapper.INSTANCE.toDto(ret);
+        return PhoneNumberMapper.INSTANCE.fromDto(ret);
     }
 
     public Collection<PhoneNumber> getByNumber(String number) {
-        return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.findAllByNumber(number));
+        return PhoneNumberMapper.INSTANCE.fromDto(phoneNumbersRepository.findAllByNumber(number));
     }
 
     public PhoneNumber get(long id) {
-        try {
-            return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.findById(id).get());
-        } catch (NoSuchElementException ex) {
-            throw new NotFoundException(PhoneNumber.class);
-        }
+        PhoneNumberDTO phn = phoneNumbersRepository.findById(id);
+        if (phn == null) throw new NotFoundException(PhoneNumber.class);
+        return PhoneNumberMapper.INSTANCE.fromDto(phn);
     }
 
     public PhoneNumber saveNew(PhoneNumber num) {
-        AccountDTO acc = accountsService.getDao(num.getAccount().getId());
-        if (acc == null) throw new ForeignKeyException(Account.class);
-        PhoneNumberDTO toRet = new PhoneNumberDTO();
-        toRet.setNumber(num.getNumber());
-        toRet.setAccount(acc);
-        return PhoneNumberMapper.INSTANCE.toDto(phoneNumbersRepository.save(toRet));
+        try {
+            return PhoneNumberMapper.INSTANCE.fromDto(phoneNumbersRepository.insert(num.getNumber(), num.getAccount().getId()));
+        } catch (DataIntegrityViolationException ex) {
+            if (ex.getCause().getMessage().contains("внешнего ключа"))
+                throw new ForeignKeyException(Account.class);
+        }
+        return null;
     }
 
     public PhoneNumber update(long id, String number, Long accountId) {
         try {
-            PhoneNumberDTO toRet = phoneNumbersRepository.findById(id).get();
-            if (toRet == null) return null;
-            if (accountId != null) {
-                AccountDTO acc = accountsService.getDao(accountId);
-                if (acc == null) throw new ForeignKeyException(Account.class);
-                toRet.setAccount(acc);
-            }
-            if (number != null) toRet.setNumber(number);
-            return PhoneNumberMapper.INSTANCE.toDto(toRet);
-        } catch (NoSuchElementException ex) {
-            throw new NotFoundException(PhoneNumber.class);
+            PhoneNumberDTO phn = phoneNumbersRepository.update(id, number, accountId);
+            if (phn == null) throw new NotFoundException(PhoneNumber.class);
+            return PhoneNumberMapper.INSTANCE.fromDto(phn);
+        } catch (
+                DataIntegrityViolationException ex) {
+            if (ex.getCause().getMessage().contains("внешнего ключа"))
+                throw new ForeignKeyException(Account.class);
         }
+        return null;
     }
 
     public void delete(long id) {
-        try {
-            phoneNumbersRepository.deleteById(id);
-        } catch (EmptyResultDataAccessException ex) {
-            throw new NotFoundException(PhoneNumber.class);
-        }
+        if (phoneNumbersRepository.deleteById(id) == 0) throw new NotFoundException(PhoneNumber.class);
     }
 }

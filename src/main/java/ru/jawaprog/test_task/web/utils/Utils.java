@@ -9,16 +9,32 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
 
+import java.util.Iterator;
+
 @Log4j2
 @Component
 public class Utils {
 
+    private final ObjectMapper objectMapper;
+
     @Autowired
-    private ObjectMapper objectMapper;
+    public Utils(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public <T> ResponseEntity<T> logAndSend(ResponseEntity<T> response, WebRequest request) {
         try {
-            log.info("Request: " + request + "; Response: " + objectMapper.writeValueAsString(response));
+            StringBuilder strb = new StringBuilder();
+            for (Iterator<String> it = request.getParameterNames(); it.hasNext(); ) {
+                String n = it.next();
+                strb.append(n).append("=[");
+                for(String val : request.getParameterValues(n))
+                {
+                    strb.append(val).append(',');
+                }
+                strb.append("]");
+            }
+            log.info("Request: " + request + "; Request Parameters: " + strb + "; Response: " + objectMapper.writeValueAsString(response));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
