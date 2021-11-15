@@ -37,10 +37,11 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         return new ServletRegistrationBean(servlet, "/ws/*");
     }
 
+
     @Bean(name = "soap-api")
     public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema countriesSchema) {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
-        wsdl11Definition.setPortTypeName("ClientsPort");
+        wsdl11Definition.setPortTypeName("SoapPort");
         wsdl11Definition.setLocationUri("/ws");
         wsdl11Definition.setTargetNamespace("http://jawaprog.ru/test-task-mts");
         wsdl11Definition.setSchema(countriesSchema);

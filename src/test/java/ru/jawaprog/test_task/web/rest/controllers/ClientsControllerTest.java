@@ -95,6 +95,7 @@ class ClientsControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
+
     }
 
 

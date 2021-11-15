@@ -16,27 +16,23 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:attribute name="id">
-        <xs:simpleType>
-            <xs:restriction base="xs:long">
-                <xs:minInclusive value="1"/>
-            </xs:restriction>
-        </xs:simpleType>
-    </xs:attribute>
+    <xs:simpleType name="id">
+        <xs:restriction base="xs:long">
+            <xs:minInclusive value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
 
-    <xs:attribute name="number">
-        <xs:simpleType>
-            <xs:restriction base="xs:string">
-                <xs:pattern value="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"/>
-            </xs:restriction>
-        </xs:simpleType>
-    </xs:attribute>
+    <xs:simpleType name="number">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:complexType name="Client">
         <xs:sequence>
             <xs:element name="contract" type="tns:Contract" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute ref="tns:id"/>
+        <xs:attribute name="id" type="tns:id"/>
         <xs:attribute name="fullName" type="xs:string"/>
         <xs:attribute name="type" type="tns:ClientType"/>
     </xs:complexType>
@@ -45,7 +41,7 @@
         <xs:sequence>
             <xs:element name="account" type="tns:Account" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute ref="tns:id"/>
+        <xs:attribute name="id" type="tns:id"/>
         <xs:attribute name="number" type="xs:long"/>
         <xs:attribute name="clientId" type="xs:long"/>
     </xs:complexType>
@@ -54,14 +50,14 @@
         <xs:sequence>
             <xs:element name="phoneNumber" type="tns:PhoneNumber" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute ref="tns:id"/>
+        <xs:attribute name="id" type="tns:id"/>
         <xs:attribute name="number" type="xs:long"/>
         <xs:attribute name="contractId" type="xs:long"/>
     </xs:complexType>
 
     <xs:complexType name="PhoneNumber">
-        <xs:attribute ref="tns:id"/>
-        <xs:attribute ref="tns:number"/>
+        <xs:attribute name="id" type="tns:id"/>
+        <xs:attribute name="number" type="tns:number"/>
         <xs:attribute name="accountId" type="xs:long"/>
     </xs:complexType>
 
@@ -96,7 +92,7 @@
 
     <xs:element name="getClientRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -107,7 +103,7 @@
     </xs:element>
     <xs:element name="findClientsByPhoneRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:number" use="required"/>
+            <xs:attribute name="number" type="tns:number" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -119,7 +115,7 @@
     </xs:element>
     <xs:element name="updateClientRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
             <xs:attribute name="fullName" type="xs:string"/>
             <xs:attribute name="type" type="tns:ClientType"/>
         </xs:complexType>
@@ -127,7 +123,7 @@
 
     <xs:element name="deleteClientRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -154,7 +150,7 @@
 
     <xs:element name="getContractRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -166,7 +162,7 @@
     </xs:element>
     <xs:element name="updateContractRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
             <xs:attribute name="number" type="xs:long"/>
             <xs:attribute name="clientId" type="xs:long"/>
         </xs:complexType>
@@ -174,7 +170,7 @@
 
     <xs:element name="deleteContractRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -201,7 +197,7 @@
 
     <xs:element name="getAccountRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -213,7 +209,7 @@
     </xs:element>
     <xs:element name="updateAccountRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
             <xs:attribute name="number" type="xs:long"/>
             <xs:attribute name="contractId" type="xs:long"/>
         </xs:complexType>
@@ -221,7 +217,7 @@
 
     <xs:element name="deleteAccountRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -248,26 +244,26 @@
 
     <xs:element name="getPhoneNumberRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 
     <xs:element name="postPhoneNumberRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:number" use="required"/>
+            <xs:attribute name="number" type="tns:number" use="required"/>
             <xs:attribute name="accountId" type="xs:long" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="updatePhoneNumberRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
-            <xs:attribute ref="tns:number"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
+            <xs:attribute name="number" type="tns:number"/>
             <xs:attribute name="accountId" type="xs:long"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="deletePhoneNumberRequest">
         <xs:complexType>
-            <xs:attribute ref="tns:id" use="required"/>
+            <xs:attribute name="id" type="tns:id" use="required"/>
         </xs:complexType>
     </xs:element>
 </xs:schema>

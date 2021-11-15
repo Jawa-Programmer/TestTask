@@ -5,13 +5,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
-import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 import ru.jawaprog.test_task_mts.Account;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Mapper
 public interface SoapAccountMapper {

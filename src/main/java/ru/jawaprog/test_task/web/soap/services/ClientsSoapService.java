@@ -17,7 +17,6 @@ import ru.jawaprog.test_task_mts.ClientType;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 
 @Service
 public class ClientsSoapService {

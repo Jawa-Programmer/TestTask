@@ -2,19 +2,15 @@ package ru.jawaprog.test_task.web.soap.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
-import ru.jawaprog.test_task.dao.entities.ContractDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
-import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapAccountMapper;
 import ru.jawaprog.test_task_mts.Account;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
 
 @Service
 public class AccountsSoapService {

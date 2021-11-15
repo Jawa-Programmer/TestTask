@@ -4,14 +4,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 import ru.jawaprog.test_task_mts.PhoneNumber;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Mapper
 public interface SoapPhoneNumberMapper {

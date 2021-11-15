@@ -2,21 +2,16 @@ package ru.jawaprog.test_task.web.soap.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
-import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
-import ru.jawaprog.test_task.web.soap.services.mappers.SoapAccountMapper;
 import ru.jawaprog.test_task.web.soap.services.mappers.SoapPhoneNumberMapper;
 import ru.jawaprog.test_task_mts.PhoneNumber;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class PhoneNumbersSoapService {

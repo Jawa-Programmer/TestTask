@@ -6,6 +6,6 @@ import org.springframework.ws.soap.server.endpoint.annotation.SoapFault;
 @SoapFault(faultCode = FaultCode.CLIENT)
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String entityName) {
-        super(entityName + " с данным id не найдено");
+        super(entityName + " с данным id не найден.");
     }
 }

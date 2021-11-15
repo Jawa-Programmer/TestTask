@@ -4,10 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
-import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
-import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 import ru.jawaprog.test_task_mts.Client;
-import ru.jawaprog.test_task_mts.Contract;
 
 import java.util.Collection;
 import java.util.List;
