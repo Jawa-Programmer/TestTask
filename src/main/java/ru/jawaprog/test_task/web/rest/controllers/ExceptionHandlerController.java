@@ -13,9 +13,9 @@ import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.ErrorInfo;
-import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
-import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
+import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 @Log4j2
@@ -44,7 +44,7 @@ public class ExceptionHandlerController {
     protected ResponseEntity<ErrorInfo> handleNotFound(NotFoundException exception, WebRequest request) {
         return utils.logAndSend(new ResponseEntity<>(
                 new ErrorInfo(HttpStatus.NOT_FOUND.value(),
-                        EntityType.fromClass(exception.getEntityClass()).name + " с переданным id не найден"),
+                        exception.getMessage()),
                 HttpStatus.NOT_FOUND
         ), request);
     }
@@ -56,10 +56,7 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(value = {ForeignKeyException.class})
     protected ResponseEntity<ErrorInfo> handleConflict(ForeignKeyException exception, WebRequest request) {
-        return utils.logAndSend(new ResponseEntity<>(new ErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                "Нарушение ограничения внешнего ключа: " +
-                        EntityType.fromClass(exception.getEntityClass()).name +
-                        " с переданным id не найден"),
+        return utils.logAndSend(new ResponseEntity<>(new ErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY.value(), exception.getLocalizedMessage()),
                 HttpStatus.UNPROCESSABLE_ENTITY
         ), request);
     }

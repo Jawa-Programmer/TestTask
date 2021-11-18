@@ -5,7 +5,7 @@ info:
   version: '1.0'
 servers:
   - url: http://localhost:8080/
-    variables: {}
+    variables: { }
     description: Тестовый сервер
 paths:
   /clients:
@@ -36,7 +36,7 @@ paths:
           description: "Тип клиента: INDIVIDUAL - физическое лицо, ENTITY - юридическое лицо"
           schema:
             type: string
-            enum: [INDIVIDUAL, ENTITY]
+            enum: [ INDIVIDUAL, ENTITY ]
       responses:
         202:
           description: "Ресурс создан. В теле передается созданный объект клиента"
@@ -62,7 +62,7 @@ paths:
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/client"
+                $ref: "#/components/schemas/client"
         404:
           description: "Клиент с заданным id не найден"
     put:
@@ -87,14 +87,14 @@ paths:
           description: "Тип клиента: INDIVIDUAL - физическое лицо, ENTITY - юридическое лицо"
           schema:
             type: string
-            enum: [INDIVIDUAL, ENTITY]
+            enum: [ INDIVIDUAL, ENTITY ]
       responses:
         200:
           description: "Успешный запрос. В теле передается объект клиента"
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/client"
+                $ref: "#/components/schemas/client"
         404:
           description: "Клиент с заданным id не найден"
     delete:
@@ -207,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/contract"
+                $ref: "#/components/schemas/contract"
         404:
           description: "Контракт с заданным id не найден"
     put:
@@ -238,7 +238,7 @@ paths:
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/contract"
+                $ref: "#/components/schemas/contract"
         404:
           description: "Контракт с заданным id не найден"
         422:
@@ -523,7 +523,7 @@ components:
           example: "Зубенко Михаил Петрович"
         type:
           type: string
-          enum: [INDIVIDUAL, ENTITY]
+          enum: [ INDIVIDUAL, ENTITY ]
     contract:
       type: object
       properties:
@@ -534,7 +534,7 @@ components:
           type: integer
           example: 8805553535
         client:
-          $ref : "#/components/schemas/client"
+          $ref: "#/components/schemas/client"
     account:
       type: object
       properties:
@@ -545,7 +545,7 @@ components:
           type: integer
           example: 8805553535
         contract:
-          $ref : "#/components/schemas/contract"
+          $ref: "#/components/schemas/contract"
     phoneNumber:
       type: object
       properties:

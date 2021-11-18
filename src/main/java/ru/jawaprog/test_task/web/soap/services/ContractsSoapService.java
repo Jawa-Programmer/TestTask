@@ -5,8 +5,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ContractDTO;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
+import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
-import ru.jawaprog.test_task.web.soap.services.mappers.SoapContractMapper;
 import ru.jawaprog.test_task_mts.Contract;
 
 import java.util.Collection;
@@ -23,20 +23,20 @@ public class ContractsSoapService {
     }
 
     public Collection<Contract> findAll() {
-        return SoapContractMapper.INSTANCE.fromDto(contractsRepository.findAll());
+        return ContractMapper.INSTANCE.toSoap(contractsRepository.findAll());
     }
 
     public Contract get(long id) {
         ContractDTO ret = contractsRepository.findById(id);
         if (ret == null)
             throw new NotFoundException("Контракт");
-        return SoapContractMapper.INSTANCE.fromDto(ret);
+        return ContractMapper.INSTANCE.toSoap(ret);
     }
 
     public Contract saveNew(long number, long clientId) {
         try {
             ContractDTO ret = contractsRepository.insert(number, clientId);
-            return SoapContractMapper.INSTANCE.fromDto(ret);
+            return ContractMapper.INSTANCE.toSoap(ret);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException("Клиент");
@@ -49,7 +49,7 @@ public class ContractsSoapService {
             ContractDTO ret = contractsRepository.update(id, number, clientId);
             if (ret == null)
                 throw new NotFoundException("Контракт");
-            return SoapContractMapper.INSTANCE.fromDto(ret);
+            return ContractMapper.INSTANCE.toSoap(ret);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException("Клиент");
@@ -58,7 +58,7 @@ public class ContractsSoapService {
     }
 
     public void delete(long id) {
-        if (contractsRepository.deleteById(id)== 0) {
+        if (contractsRepository.deleteById(id) == 0) {
             throw new NotFoundException("Контракт");
         }
     }

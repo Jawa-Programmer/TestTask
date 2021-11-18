@@ -5,7 +5,7 @@ import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import ru.jawaprog.test_task.web.soap.services.ClientsSoapService;
+import ru.jawaprog.test_task.web.rest.services.ClientsService;
 import ru.jawaprog.test_task_mts.*;
 
 import java.util.List;
@@ -14,10 +14,10 @@ import java.util.List;
 public class ClientsEndpoint {
     private static final String NAMESPACE_URI = "http://jawaprog.ru/test-task-mts";
 
-    final private ClientsSoapService service;
+    final private ClientsService service;
 
     @Autowired
-    public ClientsEndpoint(ClientsSoapService service) {
+    public ClientsEndpoint(ClientsService service) {
         this.service = service;
     }
 
@@ -25,13 +25,13 @@ public class ClientsEndpoint {
     @ResponsePayload
     public ClientsListResponse getClients() {
         ClientsListResponse response = new ClientsListResponse();
-        response.setClient(List.copyOf(service.findAll()));
+        response.setClient(List.copyOf(service.findAllSoap()));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getClientRequest")
     @ResponsePayload
-    public ClientResponse getClient(@RequestPayload GetClientRequest request) {
+    public ClientResponse getClient(@RequestPayload Client request) {
         System.out.println(request.getId());
         ClientResponse response = new ClientResponse();
         response.setClient(service.get(request.getId()));
@@ -40,34 +40,34 @@ public class ClientsEndpoint {
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "findClientsByNameRequest")
     @ResponsePayload
-    public ClientsListResponse findClientsByName(@RequestPayload FindClientsByNameRequest request) {
+    public ClientsListResponse findClientsByName(@RequestPayload Client request) {
         ClientsListResponse response = new ClientsListResponse();
-        response.setClient(List.copyOf(service.findByName(request.getName())));
+        response.setClient(List.copyOf(service.findByName(request)));
         return response;
     }
 
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "findClientsByPhoneRequest")
     @ResponsePayload
-    public ClientsListResponse findClientsByPhone(@RequestPayload FindClientsByPhoneRequest request) {
+    public ClientsListResponse findClientsByPhone(@RequestPayload PhoneNumber request) {
         ClientsListResponse response = new ClientsListResponse();
-        response.setClient(List.copyOf(service.findByPhoneNumber(request.getNumber())));
+        response.setClient(List.copyOf(service.findByPhoneNumber(request)));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "postClientRequest")
     @ResponsePayload
-    public ClientResponse postClient(@RequestPayload PostClientRequest request) {
+    public ClientResponse postClient(@RequestPayload Client request) {
         ClientResponse response = new ClientResponse();
-        response.setClient(service.saveNew(request.getFullName(), request.getType()));
+        response.setClient(service.saveNew(request));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updateClientRequest")
     @ResponsePayload
-    public ClientResponse updateClient(@RequestPayload UpdateClientRequest request) {
+    public ClientResponse updateClient(@RequestPayload Client request) {
         ClientResponse response = new ClientResponse();
-        response.setClient(service.update(request.getId(), request.getFullName(), request.getType()));
+        response.setClient(service.update(request));
         return response;
     }
 

@@ -46,7 +46,7 @@ public interface ClientsRepository {
     @Results({
             @Result(column = "full_name", property = "fullName")
     })
-    ClientDTO update(long id, String fullName, Integer type);
+    ClientDTO update(ClientDTO clientDTO);
 
     @Delete("DELETE FROM clients WHERE id=#{id}")
     int deleteById(long id);

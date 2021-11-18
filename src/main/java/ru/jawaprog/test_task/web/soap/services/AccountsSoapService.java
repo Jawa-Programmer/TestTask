@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
+import ru.jawaprog.test_task.web.rest.services.mappers.AccountMapper;
 import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
-import ru.jawaprog.test_task.web.soap.services.mappers.SoapAccountMapper;
 import ru.jawaprog.test_task_mts.Account;
 
 import java.util.Collection;
@@ -24,18 +24,18 @@ public class AccountsSoapService {
     }
 
     public Collection<Account> findAll() {
-        return SoapAccountMapper.INSTANCE.fromDto(accountsRepository.findAll());
+        return AccountMapper.INSTANCE.toSoap(accountsRepository.findAll());
     }
 
     public Account get(long id) {
         AccountDTO ret = accountsRepository.findById(id);
         if (ret == null) throw new NotFoundException("Счёт");
-        return SoapAccountMapper.INSTANCE.fromDto(ret);
+        return AccountMapper.INSTANCE.toSoap(ret);
     }
 
     public Account saveNew(long number, long contractId) {
         try {
-            return SoapAccountMapper.INSTANCE.fromDto(accountsRepository.insert(number, contractId));
+            return AccountMapper.INSTANCE.toSoap(accountsRepository.insert(number, contractId));
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException("Контракт");
@@ -47,7 +47,7 @@ public class AccountsSoapService {
         try {
             AccountDTO ret = accountsRepository.update(id, number, contractId);
             if (ret == null) throw new NotFoundException("Счёт");
-            return SoapAccountMapper.INSTANCE.fromDto(ret);
+            return AccountMapper.INSTANCE.toSoap(ret);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException("Контракт");

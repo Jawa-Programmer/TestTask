@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
+import ru.jawaprog.test_task.web.rest.services.mappers.PhoneNumberMapper;
 import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
-import ru.jawaprog.test_task.web.soap.services.mappers.SoapPhoneNumberMapper;
 import ru.jawaprog.test_task_mts.PhoneNumber;
 
 import java.util.Collection;
@@ -27,11 +27,11 @@ public class PhoneNumbersSoapService {
 
     public Collection<PhoneNumber> findAll() {
         List<PhoneNumberDTO> ret = phoneNumbersRepository.findAll();
-        return SoapPhoneNumberMapper.INSTANCE.fromDto(ret);
+        return PhoneNumberMapper.INSTANCE.toSoap(ret);
     }
 
     public Collection<PhoneNumber> getByNumber(String number) {
-        return SoapPhoneNumberMapper.INSTANCE.fromDto(phoneNumbersRepository.findAllByNumber(number));
+        return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersRepository.findAllByNumber(number));
     }
 
     public PhoneNumber get(long id) {
@@ -39,12 +39,12 @@ public class PhoneNumbersSoapService {
         if (ret == null)
             throw new NotFoundException("Номер телефона");
 
-        return SoapPhoneNumberMapper.INSTANCE.fromDto(ret);
+        return PhoneNumberMapper.INSTANCE.toSoap(ret);
     }
 
     public PhoneNumber saveNew(String number, long accountId) {
         try {
-            return SoapPhoneNumberMapper.INSTANCE.fromDto(phoneNumbersRepository.insert(number, accountId));
+            return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersRepository.insert(number, accountId));
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException("Счёт");
@@ -57,7 +57,7 @@ public class PhoneNumbersSoapService {
             PhoneNumberDTO ret = phoneNumbersRepository.update(id, number, accountId);
             if (ret == null)
                 throw new NotFoundException("Номер телефона");
-            return SoapPhoneNumberMapper.INSTANCE.fromDto(ret);
+            return PhoneNumberMapper.INSTANCE.toSoap(ret);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException("Счёт");

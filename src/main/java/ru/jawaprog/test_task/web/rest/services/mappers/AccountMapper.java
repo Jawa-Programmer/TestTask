@@ -9,6 +9,7 @@ import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 
 import java.util.Collection;
+import java.util.List;
 
 @Mapper
 public interface AccountMapper {
@@ -16,12 +17,27 @@ public interface AccountMapper {
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "number", target = "number")
-    @Mapping(target = "contract", expression = "java(ContractMapper.INSTANCE.fromId(account.getContractId()))")
-    Account fromDto(AccountDTO account);
+    @Mapping(target = "contract", expression = "java(ContractMapper.INSTANCE.restFromId(account.getContractId()))")
+    Account toRest(AccountDTO account);
 
-    default Account fromId(long id) {
-        return fromDto(ApplicationContextProvider.getApplicationContext().getBean(AccountsRepository.class).findById(id));
+    default Account restFromId(long id) {
+        return toRest(ApplicationContextProvider.getApplicationContext().getBean(AccountsRepository.class).findById(id));
     }
 
-    Collection<Account> fromDto(Collection<AccountDTO> accounts);
+    Collection<Account> toRest(Collection<AccountDTO> accounts);
+
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "number", target = "number")
+    @Mapping(target = "phoneNumber", expression = "java(PhoneNumberMapper.INSTANCE.fromAccountId(account.getId()))")
+    @Mapping(source = "contractId", target = "contractId")
+    ru.jawaprog.test_task_mts.Account toSoap(AccountDTO account);
+
+    default List<ru.jawaprog.test_task_mts.Account> fromContractId(long id) {
+        return toSoap(ApplicationContextProvider.getApplicationContext().getBean(AccountsRepository.class).findAccountsByContractId(id));
+    }
+
+    Collection<ru.jawaprog.test_task_mts.Account> toSoap(Collection<AccountDTO> accounts);
+
+    List<ru.jawaprog.test_task_mts.Account> toSoap(List<AccountDTO> accounts);
 }

@@ -1,31 +1,19 @@
 package ru.jawaprog.test_task.web.soap.endpoints;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.ws.test.server.MockWebServiceClient;
 import org.springframework.ws.test.server.RequestCreators;
 import org.springframework.ws.test.server.ResponseMatchers;
 import org.springframework.xml.transform.StringSource;
-import ru.jawaprog.test_task.web.rest.services.AccountsService;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
-import ru.jawaprog.test_task.web.rest.services.ContractsService;
-import ru.jawaprog.test_task.web.rest.services.PhoneNumbersService;
+import ru.jawaprog.test_task.configuration.WebServiceConfig;
 import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.soap.services.AccountsSoapService;
-import ru.jawaprog.test_task.web.soap.services.ClientsSoapService;
-import ru.jawaprog.test_task.web.soap.services.ContractsSoapService;
-import ru.jawaprog.test_task.web.soap.services.PhoneNumbersSoapService;
-import ru.jawaprog.test_task.web.utils.Utils;
 import ru.jawaprog.test_task_mts.Account;
 
 import javax.xml.transform.Source;
@@ -33,48 +21,14 @@ import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
+@ContextConfiguration(classes = {TestConfig.class, WebServiceConfig.class})
 class AccountsEndpointTest {
-    @TestConfiguration
-    @ComponentScan("ru.jawaprog.test_task.web.soap.endpoints")
-    static class TestConfig {
-        @Bean
-        Utils getUtils(ObjectMapper objectMapper) {
-            return new Utils(objectMapper);
-        }
 
-        @Bean()
-        MockWebServiceClient mockClient(ApplicationContext context) {
-            return MockWebServiceClient.createClient(context);
-        }
-
-    }
-
-    @MockBean
+    @Autowired
     private AccountsSoapService service;
 
     @Autowired
     private MockWebServiceClient mockClient;
-
-
-    // Нижележащие бины созданы потому что без них тест не запускается, хотя по факту они нигде не используются в тесте
-
-
-    @MockBean
-    private ClientsSoapService clientsSoapService;
-    @MockBean
-    private ContractsSoapService contractsSoapService;
-    @MockBean
-    private PhoneNumbersSoapService phoneNumbersSoapService;
-
-    // эти бины вообще нужны только REST контроллеру, но без них mockClient тоже не может собраться
-    @MockBean
-    private ClientsService clientsService;
-    @MockBean
-    private AccountsService accountsService;
-    @MockBean
-    private ContractsService contractsService;
-    @MockBean
-    private PhoneNumbersService phoneNumbersService;
 
     @Test
     void getAccounts() {
@@ -121,7 +75,7 @@ class AccountsEndpointTest {
                     "<getAccountRequest id='2' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
-                            "<faultcode>SOAP-ENV:Server</faultcode>" +
+                            "<faultcode>SOAP-ENV:Client</faultcode>" +
                             "<faultstring xml:lang='en'>Счёт с данным id не найден.</faultstring>" +
                             "</SOAP-ENV:Fault>");
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
@@ -151,7 +105,7 @@ class AccountsEndpointTest {
                     "<postAccountRequest contractId='3' number='787' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
-                            "<faultcode>SOAP-ENV:Server</faultcode>" +
+                            "<faultcode>SOAP-ENV:Client</faultcode>" +
                             "<faultstring xml:lang='en'>Ошибка внешнего ключа. Контракт с переданным id не найден.</faultstring>" +
                             "</SOAP-ENV:Fault>");
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
@@ -182,7 +136,7 @@ class AccountsEndpointTest {
                     "<updateAccountRequest id='2' contractId='2' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
-                            "<faultcode>SOAP-ENV:Server</faultcode>" +
+                            "<faultcode>SOAP-ENV:Client</faultcode>" +
                             "<faultstring xml:lang='en'>Счёт с данным id не найден.</faultstring>" +
                             "</SOAP-ENV:Fault>");
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
@@ -192,7 +146,7 @@ class AccountsEndpointTest {
                     "<updateAccountRequest id='1' contractId='2' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
-                            "<faultcode>SOAP-ENV:Server</faultcode>" +
+                            "<faultcode>SOAP-ENV:Client</faultcode>" +
                             "<faultstring xml:lang='en'>Ошибка внешнего ключа. Контракт с переданным id не найден.</faultstring>" +
                             "</SOAP-ENV:Fault>");
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
@@ -217,7 +171,7 @@ class AccountsEndpointTest {
                     "<deleteAccountRequest id='2' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
-                            "<faultcode>SOAP-ENV:Server</faultcode>" +
+                            "<faultcode>SOAP-ENV:Client</faultcode>" +
                             "<faultstring xml:lang='en'>Счёт с данным id не найден.</faultstring>" +
                             "</SOAP-ENV:Fault>");
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));

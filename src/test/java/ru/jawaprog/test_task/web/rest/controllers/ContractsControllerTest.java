@@ -8,9 +8,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -19,14 +17,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
-import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
-import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
-import ru.jawaprog.test_task.web.rest.services.AccountsService;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
 import ru.jawaprog.test_task.web.rest.services.ContractsService;
-import ru.jawaprog.test_task.web.rest.services.PhoneNumbersService;
-import ru.jawaprog.test_task.web.utils.Utils;
+import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Collection;
@@ -37,15 +31,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
+@ContextConfiguration(classes = TestConfig.class)
 class ContractsControllerTest {
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        Utils getUtils(ObjectMapper objectMapper) {
-            return new Utils(objectMapper);
-        }
-    }
 
     private static final String BASE_PATH = "/contracts";
 
@@ -53,16 +41,8 @@ class ContractsControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
+    @Autowired
     private ContractsService service;
-
-    // бины дальше созданы потому что без них тест не запускается, хотя по факту они нигде не используются в тесте
-    @MockBean
-    private ClientsService clientsService;
-    @MockBean
-    private AccountsService accountsService;
-    @MockBean
-    private PhoneNumbersService phoneNumbersService;
 
     Collection<Contract> database;
 
@@ -71,7 +51,7 @@ class ContractsControllerTest {
         database = new HashSet<>();
         Client cl = new Client();
         cl.setFullName("ОАО \"Общество огромных растений\"");
-        cl.setId(1);
+        cl.setId(1L);
         cl.setType(Client.ClientType.ENTITY);
         {
             Contract c = new Contract();

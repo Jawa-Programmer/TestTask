@@ -45,7 +45,7 @@ public class LogInterceptor implements EndpointInterceptor {
         message.append("Response body: \n");
         transformer.transform(messageContext.getResponse().getPayloadSource(), new StreamResult(message));
         log.info(message);
-        if(ex != null) log.info("была ошибка " +  ex.getLocalizedMessage());
+        if (ex != null) log.info("была ошибка " + ex.getLocalizedMessage());
     }
 
     private Transformer createNonIndentingTransformer() throws TransformerConfigurationException {

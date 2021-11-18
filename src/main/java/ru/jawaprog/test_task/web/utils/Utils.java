@@ -28,8 +28,7 @@ public class Utils {
             for (Iterator<String> it = request.getParameterNames(); it.hasNext(); ) {
                 String n = it.next();
                 strb.append(n).append("=[");
-                for(String val : request.getParameterValues(n))
-                {
+                for (String val : request.getParameterValues(n)) {
                     strb.append(val).append(',');
                 }
                 strb.append("]");

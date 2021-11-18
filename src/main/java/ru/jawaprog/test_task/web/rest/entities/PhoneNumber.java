@@ -10,8 +10,16 @@ import lombok.Setter;
 @ApiModel(description = "Описание номера телефона в сети МТС")
 public class PhoneNumber {
 
+    public PhoneNumber() {
+    }
+
+    public PhoneNumber(Long id, String number) {
+        this.id = id;
+        this.number = number;
+    }
+
     @ApiModelProperty(value = "Идентификатор номера телефона. Первичный ключ в БД", example = "1")
-    private long id;
+    private Long id;
 
     @ApiModelProperty(value = "Номер телефона в формате +7 (xxx) xxx-xx-xx", example = "+7 (800) 555-35-35")
     private String number;

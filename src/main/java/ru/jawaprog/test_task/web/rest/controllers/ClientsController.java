@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
+import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
 import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
 import ru.jawaprog.test_task.web.rest.services.ClientsService;
 import ru.jawaprog.test_task.web.utils.Utils;
@@ -43,7 +44,7 @@ public class ClientsController {
             @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        Client c = clientsService.get(id);
+        Client c = clientsService.get(new Client(id, null, null));
         return utils.logAndSend(new ResponseEntity<>(c, HttpStatus.OK), request);
     }
 
@@ -58,7 +59,7 @@ public class ClientsController {
             @ApiParam(value = "Идентификатор клиента", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        return utils.logAndSend(new ResponseEntity<>(clientsService.getClientsContracts(id), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(clientsService.getClientsContracts(new Client(id, null, null)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список клиентов, в чьем имени содержится данная подстрока")
@@ -70,7 +71,7 @@ public class ClientsController {
             WebRequest request,
             @ApiParam(value = "Фрагмент имени клиента", required = true) @PathVariable String name
     ) {
-        return utils.logAndSend(new ResponseEntity<>(clientsService.findByName(name), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(clientsService.findByName(new Client(null, name, null)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список клиентов по номеру телефона")
@@ -82,7 +83,7 @@ public class ClientsController {
             WebRequest request,
             @ApiParam(value = "Номер телефона", required = true) @PathVariable String number
     ) {
-        return utils.logAndSend(new ResponseEntity<>(clientsService.findByPhoneNumber(number), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(clientsService.findByPhoneNumber(new PhoneNumber(null, number)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список всех клиентов")
@@ -91,7 +92,7 @@ public class ClientsController {
     })
     @GetMapping
     public ResponseEntity<Collection<Client>> getClients(WebRequest request) {
-        return utils.logAndSend(new ResponseEntity<>(clientsService.findAll(), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(clientsService.findAllRest(), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Вносит нового клиента в базу данных")
@@ -124,7 +125,7 @@ public class ClientsController {
         utils.validateId(id);
         if (fullName != null && fullName.isBlank()) // пока так, ведь @NotBlank бракует null строки, хотя мне нужно их пропускать дальше
             throw new InvalidParamsException("updateClient.fullName: не должно быть пустым");
-        Client client = clientsService.update(id, fullName, type);
+        Client client = clientsService.update(new Client(id, fullName, type));
         return utils.logAndSend(new ResponseEntity<>(client, HttpStatus.OK), request);
     }
 

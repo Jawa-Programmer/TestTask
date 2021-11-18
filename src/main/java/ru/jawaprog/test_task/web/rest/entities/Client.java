@@ -14,8 +14,17 @@ public class Client {
         ENTITY
     }
 
+    public Client() {
+    }
+
+    public Client(Long id, String fullName, ClientType type) {
+        this.id = id;
+        this.fullName = fullName;
+        this.type = type;
+    }
+
     @ApiModelProperty(value = "Идентификатор клиента. Первичный ключ в БД", example = "1")
-    private long id;
+    private Long id;
 
     @ApiModelProperty(value = "ФИО физического лица или наименование организации", example = "ИП Иванова")
     private String fullName;

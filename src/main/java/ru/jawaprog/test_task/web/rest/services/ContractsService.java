@@ -8,12 +8,11 @@ import ru.jawaprog.test_task.dao.entities.ContractDTO;
 import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
 import ru.jawaprog.test_task.web.rest.entities.Account;
-import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
-import ru.jawaprog.test_task.web.rest.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.web.rest.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.rest.services.mappers.AccountMapper;
 import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
+import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 
 import java.util.Collection;
 
@@ -30,23 +29,23 @@ public class ContractsService {
     }
 
     public Collection<Contract> findAll() {
-        return ContractMapper.INSTANCE.fromDto(contractsRepository.findAll());
+        return ContractMapper.INSTANCE.toRest(contractsRepository.findAll());
     }
 
     public Contract get(long id) {
         ContractDTO ct = contractsRepository.findById(id);
         if (ct == null)
-            throw new NotFoundException(Contract.class);
+            throw new NotFoundException("Контракт");
         else
-            return ContractMapper.INSTANCE.fromDto(ct);
+            return ContractMapper.INSTANCE.toRest(ct);
     }
 
     public Contract saveNew(Contract c) {
         try {
-            return ContractMapper.INSTANCE.fromDto(contractsRepository.insert(c.getNumber(), c.getClient().getId()));
+            return ContractMapper.INSTANCE.toRest(contractsRepository.insert(c.getNumber(), c.getClient().getId()));
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
-                throw new ForeignKeyException(Client.class);
+                throw new ForeignKeyException("Клиент");
         }
         return null;
     }
@@ -55,23 +54,23 @@ public class ContractsService {
         try {
             ContractDTO ct = contractsRepository.update(id, number, clientId);
             if (ct == null)
-                throw new NotFoundException(Contract.class);
+                throw new NotFoundException("Контракт");
             else
-                return ContractMapper.INSTANCE.fromDto(ct);
+                return ContractMapper.INSTANCE.toRest(ct);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
-                throw new ForeignKeyException(Client.class);
+                throw new ForeignKeyException("Клиент");
         }
         return null;
     }
 
     public void delete(long id) {
         int ret = contractsRepository.deleteById(id);
-        if (ret == 0) throw new NotFoundException(Contract.class);
+        if (ret == 0) throw new NotFoundException("Контракт");
     }
 
     public Collection<Account> getContractsAccounts(long id) {
         Collection<AccountDTO> accs = accountsRepository.findAccountsByContractId(id);
-        return AccountMapper.INSTANCE.fromDto(accs);
+        return AccountMapper.INSTANCE.toRest(accs);
     }
 }
