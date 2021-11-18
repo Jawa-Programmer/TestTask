@@ -11,11 +11,25 @@ import lombok.Setter;
 public class Account {
 
     @ApiModelProperty(value = "Идентификатор счёта. Первичный ключ в БД", example = "1")
-    long id;
+    Long id;
 
     @ApiModelProperty(value = "Номер счёта.", example = "111222333444")
-    long number;
+    Long number;
 
     @ApiModelProperty(value = "Контракт, по которому открыт данный счёт")
     Contract contract;
+
+    public Account() {
+    }
+
+    public Account(Long id) {
+        this.id = id;
+    }
+
+    public Account(Long id, Long number, Long contractId) {
+        this.id = id;
+        this.number = number;
+        if (contractId != null)
+            this.contract = new Contract(contractId);
+    }
 }

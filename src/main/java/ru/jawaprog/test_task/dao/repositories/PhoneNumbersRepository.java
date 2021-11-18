@@ -3,7 +3,6 @@ package ru.jawaprog.test_task.dao.repositories;
 import org.apache.ibatis.annotations.*;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public interface PhoneNumbersRepository {
@@ -30,7 +29,7 @@ public interface PhoneNumbersRepository {
     @Results({
             @Result(column = "account_id", property = "accountId")
     })
-    PhoneNumberDTO insert(@NotNull String number, long accountId);
+    PhoneNumberDTO insert(PhoneNumberDTO number);
 
     @Select("<script>\n" +
             "  update accounts\n" +
@@ -43,7 +42,7 @@ public interface PhoneNumbersRepository {
     @Results({
             @Result(column = "account_id", property = "accountId")
     })
-    PhoneNumberDTO update(long id, String number, Long accountId);
+    PhoneNumberDTO update(PhoneNumberDTO number);
 
     @Select("SELECT * FROM phone_numbers WHERE account_id = #{id}")
     @Results({

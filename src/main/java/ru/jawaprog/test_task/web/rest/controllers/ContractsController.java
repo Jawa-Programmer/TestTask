@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import ru.jawaprog.test_task.services.ContractsService;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
-import ru.jawaprog.test_task.web.rest.services.ContractsService;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.Min;
@@ -41,7 +41,7 @@ public class ContractsController {
             @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        Contract c = contractsService.get(id);
+        Contract c = contractsService.get(new Contract(id));
         return utils.logAndSend(new ResponseEntity<>(c, HttpStatus.OK), request);
     }
 
@@ -56,7 +56,7 @@ public class ContractsController {
             @ApiParam(value = "Идентификатор контракта", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        return utils.logAndSend(new ResponseEntity<>(contractsService.getContractsAccounts(id), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(contractsService.getContractsAccounts(new Contract(id)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список всех контрактов")
@@ -65,7 +65,7 @@ public class ContractsController {
     })
     @GetMapping
     public ResponseEntity<Collection<Contract>> getContracts(WebRequest request) {
-        return new ResponseEntity<>(contractsService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(contractsService.findAllRest(), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Добавить новый контракт в базу данных")
@@ -103,7 +103,7 @@ public class ContractsController {
             @ApiParam(value = "id клиента. Внешний ключ") @Min(1) @RequestParam(value = "clientId", required = false) Long clientId
     ) {
         utils.validateId(id);
-        return utils.logAndSend(new ResponseEntity<>(contractsService.update(id, contractNumber, clientId), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(contractsService.update(new Contract(id, contractNumber, clientId)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Удалить контракт по id")

@@ -8,10 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import ru.jawaprog.test_task.services.AccountsService;
 import ru.jawaprog.test_task.web.rest.entities.Account;
-import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
-import ru.jawaprog.test_task.web.rest.services.AccountsService;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.Min;
@@ -41,7 +40,7 @@ public class AccountController {
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        Account acc = accountsService.get(id);
+        Account acc = accountsService.get(new Account(id));
         return utils.logAndSend(new ResponseEntity<>(acc, HttpStatus.OK), request);
     }
 
@@ -55,7 +54,7 @@ public class AccountController {
             @ApiParam(value = "Идентификатор лицевого счёта", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        return utils.logAndSend(new ResponseEntity<>(accountsService.getAccountsPhones(id), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(accountsService.getAccountsPhones(new Account(id)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список лицевых счетов")
@@ -64,7 +63,7 @@ public class AccountController {
     })
     @GetMapping
     public ResponseEntity<Collection<Account>> getAccounts(WebRequest request) {
-        return utils.logAndSend(new ResponseEntity<>(accountsService.findAll(), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(accountsService.findAllRest(), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Занести новый счёт в базу данных")
@@ -77,12 +76,7 @@ public class AccountController {
             WebRequest request,
             @ApiParam(value = "Номер лицевого счёта", required = true) @Min(0) @RequestParam(value = "number") long number,
             @ApiParam(value = "Номер контракта. Внешний ключ", required = true) @Min(1) @RequestParam(value = "contractId") long contractId) {
-        Contract contract = new Contract();
-        contract.setId(contractId);
-        Account account = new Account();
-        account.setContract(contract);
-        account.setNumber(number);
-        account = accountsService.saveNew(account);
+        Account account = accountsService.saveNew(new Account(null, number, contractId));
         return utils.logAndSend(new ResponseEntity<>(account, HttpStatus.CREATED), request);
     }
 
@@ -100,7 +94,7 @@ public class AccountController {
             @ApiParam(value = "Номер контракта. Внешний ключ") @Min(1) @RequestParam(value = "contractId", required = false) Long contractId
     ) {
         utils.validateId(id);
-        return utils.logAndSend(new ResponseEntity<>(accountsService.update(id, number, contractId), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(accountsService.update(new Account(id, number, contractId)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Удалить лицевой счет по id")

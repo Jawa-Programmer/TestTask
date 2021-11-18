@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.web.rest.entities.Client;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
 
 import java.util.Collection;
 import java.util.HashSet;

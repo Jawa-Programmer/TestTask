@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.services.mappers;
+package ru.jawaprog.test_task.services.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -40,4 +40,8 @@ public interface AccountMapper {
     Collection<ru.jawaprog.test_task_mts.Account> toSoap(Collection<AccountDTO> accounts);
 
     List<ru.jawaprog.test_task_mts.Account> toSoap(List<AccountDTO> accounts);
+
+    AccountDTO toDto(Account account);
+
+    AccountDTO toDto(ru.jawaprog.test_task_mts.Account account);
 }

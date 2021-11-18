@@ -7,11 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import ru.jawaprog.test_task.exceptions.InvalidParamsException;
+import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
-import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.NotBlank;
@@ -83,7 +83,7 @@ public class ClientsController {
             WebRequest request,
             @ApiParam(value = "Номер телефона", required = true) @PathVariable String number
     ) {
-        return utils.logAndSend(new ResponseEntity<>(clientsService.findByPhoneNumber(new PhoneNumber(null, number)), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(clientsService.findByPhoneNumber(new PhoneNumber(null, number, null)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список всех клиентов")

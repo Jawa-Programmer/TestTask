@@ -5,7 +5,7 @@ import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import ru.jawaprog.test_task.web.soap.services.ContractsSoapService;
+import ru.jawaprog.test_task.services.ContractsService;
 import ru.jawaprog.test_task.web.utils.Utils;
 import ru.jawaprog.test_task_mts.*;
 
@@ -15,10 +15,10 @@ import java.util.List;
 public class ContractsEndpoint {
     private static final String NAMESPACE_URI = "http://jawaprog.ru/test-task-mts";
 
-    final private ContractsSoapService service;
+    final private ContractsService service;
 
     @Autowired
-    public ContractsEndpoint(ContractsSoapService service, Utils utils) {
+    public ContractsEndpoint(ContractsService service, Utils utils) {
         this.service = service;
     }
 
@@ -27,33 +27,33 @@ public class ContractsEndpoint {
     @ResponsePayload
     public ContractsListResponse getContracts() {
         ContractsListResponse response = new ContractsListResponse();
-        response.setContract(List.copyOf(service.findAll()));
+        response.setContract(List.copyOf(service.findAllSoap()));
 
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getContractRequest")
     @ResponsePayload
-    public ContractResponse getContract(@RequestPayload GetContractRequest request) {
+    public ContractResponse getContract(@RequestPayload Contract request) {
         ContractResponse response = new ContractResponse();
-        response.setContract(service.get(request.getId()));
+        response.setContract(service.get(request));
 
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "postContractRequest")
     @ResponsePayload
-    public ContractResponse postContract(@RequestPayload PostContractRequest request) {
+    public ContractResponse postContract(@RequestPayload Contract request) {
         ContractResponse response = new ContractResponse();
-        response.setContract(service.saveNew(request.getNumber(), request.getClientId()));
+        response.setContract(service.saveNew(request));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updateContractRequest")
     @ResponsePayload
-    public ContractResponse updateContract(@RequestPayload UpdateContractRequest request) {
+    public ContractResponse updateContract(@RequestPayload Contract request) {
         ContractResponse response = new ContractResponse();
-        response.setContract(service.update(request.getId(), request.getNumber(), request.getClientId()));
+        response.setContract(service.update(request));
         return response;
     }
 

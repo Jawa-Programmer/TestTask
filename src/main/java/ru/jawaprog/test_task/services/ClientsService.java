@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.services;
+package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,12 +9,12 @@ import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
 import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
 import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
 import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
+import ru.jawaprog.test_task.exceptions.NotFoundException;
+import ru.jawaprog.test_task.services.mappers.ClientMapper;
+import ru.jawaprog.test_task.services.mappers.ContractMapper;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
-import ru.jawaprog.test_task.web.rest.services.mappers.ClientMapper;
-import ru.jawaprog.test_task.web.rest.services.mappers.ContractMapper;
-import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -91,7 +91,7 @@ public class ClientsService {
     }
 
 
-    public Collection<ru.jawaprog.test_task_mts.Client> findAllSoap() {
+    public List<ru.jawaprog.test_task_mts.Client> findAllSoap() {
         return ClientMapper.INSTANCE.toSoap(clientsRepository.findAll());
     }
 

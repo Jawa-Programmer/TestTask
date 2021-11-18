@@ -5,7 +5,7 @@ import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
+import ru.jawaprog.test_task.services.ClientsService;
 import ru.jawaprog.test_task_mts.*;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class ClientsEndpoint {
     @ResponsePayload
     public ClientsListResponse getClients() {
         ClientsListResponse response = new ClientsListResponse();
-        response.setClient(List.copyOf(service.findAllSoap()));
+        response.setClient(service.findAllSoap());
         return response;
     }
 

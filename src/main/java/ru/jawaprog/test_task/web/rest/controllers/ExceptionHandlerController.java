@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.jawaprog.test_task.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.exceptions.InvalidParamsException;
+import ru.jawaprog.test_task.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.rest.entities.Client;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.rest.entities.ErrorInfo;
-import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
-import ru.jawaprog.test_task.web.soap.exceptions.ForeignKeyException;
-import ru.jawaprog.test_task.web.soap.exceptions.NotFoundException;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 @Log4j2

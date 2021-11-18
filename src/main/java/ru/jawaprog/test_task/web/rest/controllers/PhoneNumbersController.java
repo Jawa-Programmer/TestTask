@@ -11,9 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import ru.jawaprog.test_task.web.rest.entities.Account;
+import ru.jawaprog.test_task.services.PhoneNumbersService;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
-import ru.jawaprog.test_task.web.rest.services.PhoneNumbersService;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 import javax.validation.constraints.Min;
@@ -43,7 +42,7 @@ public class PhoneNumbersController {
             @ApiParam(value = "Идентификатор номера телефона", required = true, example = "1") @PathVariable long id
     ) {
         utils.validateId(id);
-        PhoneNumber phoneNumber = phoneNumbersService.get(id);
+        PhoneNumber phoneNumber = phoneNumbersService.get(new PhoneNumber(id));
         return utils.logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.OK), request);
     }
 
@@ -52,7 +51,7 @@ public class PhoneNumbersController {
     })
     @GetMapping
     public ResponseEntity<Collection<PhoneNumber>> getPhoneNumbers(WebRequest request) {
-        return utils.logAndSend(new ResponseEntity<>(phoneNumbersService.findAll(), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(phoneNumbersService.findAllRest(), HttpStatus.OK), request);
     }
 
     @ApiResponses(value = {
@@ -65,14 +64,7 @@ public class PhoneNumbersController {
             @ApiParam(value = "Номер телефона", required = true) @Pattern(regexp = "\\+7 \\(\\d{3}\\) \\d{3}-\\d{2}-\\d{2}") @RequestParam(value = "number") String number,
             @ApiParam(value = "id лицевого счёта. Внешний ключ", required = true) @Min(1) @RequestParam(value = "accountId") long accountId
     ) {
-        Account account = new Account();
-        account.setId(accountId);
-
-        PhoneNumber phoneNumber = new PhoneNumber();
-        phoneNumber.setAccount(account);
-        phoneNumber.setNumber(number);
-        phoneNumber = phoneNumbersService.saveNew(phoneNumber);
-
+        PhoneNumber phoneNumber = phoneNumbersService.saveNew(new PhoneNumber(null, number, accountId));
         return utils.logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.CREATED), request);
     }
 
@@ -89,8 +81,7 @@ public class PhoneNumbersController {
             @ApiParam(value = "id лицевого счёта. Внешний ключ") @Min(1) @RequestParam(value = "accountId", required = false) Long accountId
     ) {
         utils.validateId(id);
-        PhoneNumber phoneNumber;
-        phoneNumber = phoneNumbersService.update(id, number, accountId);
+        PhoneNumber phoneNumber = phoneNumbersService.update(new PhoneNumber(id, number, accountId));
         return utils.logAndSend(new ResponseEntity<>(phoneNumber, HttpStatus.OK), request);
     }
 

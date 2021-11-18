@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.services.mappers;
+package ru.jawaprog.test_task.services.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,4 +34,7 @@ public interface PhoneNumberMapper {
     }
 
     List<ru.jawaprog.test_task_mts.PhoneNumber> toSoap(List<PhoneNumberDTO> phoneNumbers);
+
+    PhoneNumberDTO toDto(ru.jawaprog.test_task_mts.PhoneNumber number);
+    PhoneNumberDTO toDto(PhoneNumber number);
 }

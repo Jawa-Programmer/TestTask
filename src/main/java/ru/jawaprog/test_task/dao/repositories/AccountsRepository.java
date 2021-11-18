@@ -32,7 +32,7 @@ public interface AccountsRepository {
     @Results({
             @Result(column = "contract_id", property = "contractId")
     })
-    AccountDTO insert(long number, long contractId);
+    AccountDTO insert(AccountDTO account);
 
     @Select("<script>\n" +
             "  update accounts\n" +
@@ -45,7 +45,7 @@ public interface AccountsRepository {
     @Results({
             @Result(column = "contract_id", property = "contractId")
     })
-    AccountDTO update(long id, Long number, Long contractId);
+    AccountDTO update(AccountDTO account);
 
     @Delete("DELETE FROM accounts WHERE id = #{id}")
     int deleteById(long id);

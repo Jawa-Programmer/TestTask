@@ -1,44 +1,56 @@
 package ru.jawaprog.test_task.web.soap.endpoints;
 
+import org.junit.FixMethodOrder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.ws.test.server.MockWebServiceClient;
+import org.springframework.ws.test.server.RequestCreators;
+import org.springframework.ws.test.server.ResponseMatchers;
+import org.springframework.xml.transform.StringSource;
 import ru.jawaprog.test_task.configuration.WebServiceConfig;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
 
+import javax.sql.DataSource;
+import javax.xml.transform.Source;
 
+@ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
 @ContextConfiguration(classes = {TestConfig.class, WebServiceConfig.class})
 class ClientsEndpointTest {
-    @Autowired
-    private ClientsService service;
 
     @Autowired
     private MockWebServiceClient mockClient;
-/*
+
+    @Autowired
+    private DataSource driver;
+
+    @BeforeAll
+    void initDatabase() {
+        Resource initSchema = new ClassPathResource("client-test.sql", getClass().getClassLoader());
+        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+        DatabasePopulatorUtils.execute(databasePopulator, driver);
+    }
+
     @Test
     void getClients() {
-        Client c1 = new Client(), c2 = new Client();
-        c1.setId(1L);
-        c1.setFullName("Иванов И. И.");
-        c1.setType(ClientType.INDIVIDUAL);
-        c1.setContract(null);
-        c2.setId(2L);
-        c2.setFullName("ОАО \"Общество Гигантских растений\"");
-        c2.setType(ClientType.ENTITY);
-        c2.setContract(null);
-
-        Mockito.when(service.findAll()).thenReturn(List.of(c1, c2));
 
         Source requestPayload = new StringSource(
                 "<getClientsRequest xmlns = 'http://jawaprog.ru/test-task-mts'/>");
         Source responsePayload = new StringSource(
                 "<ClientsListResponse xmlns='http://jawaprog.ru/test-task-mts'>" +
                         "<client fullName='Иванов И. И.' id='1' type='INDIVIDUAL'/>" +
-                        "<client fullName='ОАО \"Общество Гигантских растений\"' id='2' type='ENTITY'/>" +
+                        "<client fullName=\"ОАО 'Общество Гигантских растений'\" id='2' type='ENTITY'/>" +
                         "</ClientsListResponse>");
         mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
 
@@ -46,13 +58,6 @@ class ClientsEndpointTest {
 
     @Test
     void getClient() {
-        Client c1 = new Client();
-        c1.setId(1L);
-        c1.setFullName("Иванов И. И.");
-        c1.setType(ClientType.INDIVIDUAL);
-        c1.setContract(null);
-        Mockito.when(service.get(1)).thenReturn(c1);
-        Mockito.when(service.get(2)).thenThrow(new NotFoundException("Клиент"));
         {
             Source requestPayload = new StringSource(
                     "<getClientRequest id='1' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
@@ -62,10 +67,9 @@ class ClientsEndpointTest {
                             "</ClientResponse>");
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
         }
-
         {
             Source requestPayload = new StringSource(
-                    "<getClientRequest id='2' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
+                    "<getClientRequest id='99' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
                             "<faultcode>SOAP-ENV:Client</faultcode>" +
@@ -77,15 +81,9 @@ class ClientsEndpointTest {
 
     @Test
     void findClientsByName() {
-        Client c1 = new Client();
-        c1.setId(1L);
-        c1.setFullName("Иванов И. И.");
-        c1.setType(ClientType.INDIVIDUAL);
-        c1.setContract(null);
-        Mockito.when(service.findByName("Ив")).thenReturn(List.of(c1));
         {
             Source requestPayload = new StringSource(
-                    "<findClientsByNameRequest name='Ив' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
+                    "<findClientsByNameRequest fullName='Ив' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<ClientsListResponse xmlns='http://jawaprog.ru/test-task-mts'>" +
                             "<client fullName='Иванов И. И.' id='1' type='INDIVIDUAL'/>" +
@@ -96,7 +94,6 @@ class ClientsEndpointTest {
 
     @Test
     void findClientsByPhone() {
-        Mockito.when(service.findByPhoneNumber(ArgumentMatchers.any())).thenReturn(new ArrayList<>());
         {
             Source requestPayload = new StringSource(
                     "<findClientsByPhoneRequest number='+7 (800) 555-35-35' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
@@ -108,12 +105,6 @@ class ClientsEndpointTest {
 
     @Test
     void postClient() {
-        Client c1 = new Client();
-        c1.setId(3L);
-        c1.setFullName("Зубенко Михаил Петрович");
-        c1.setType(ClientType.INDIVIDUAL);
-        c1.setContract(null);
-        Mockito.when(service.saveNew("Зубенко Михаил Петрович", ClientType.INDIVIDUAL)).thenReturn(c1);
         {
             Source requestPayload = new StringSource(
                     "<postClientRequest fullName='Зубенко Михаил Петрович' type='INDIVIDUAL' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
@@ -127,13 +118,6 @@ class ClientsEndpointTest {
 
     @Test
     void updateClient() {
-        Client c1 = new Client();
-        c1.setId(1L);
-        c1.setFullName("Иванов И. А.");
-        c1.setType(ClientType.INDIVIDUAL);
-        c1.setContract(null);
-        Mockito.when(service.update(1, "Иванов И. А.", null)).thenReturn(c1);
-        Mockito.when(service.update(2, null, ClientType.ENTITY)).thenThrow(new NotFoundException("Клиент"));
         {
             Source requestPayload = new StringSource(
                     "<updateClientRequest id='1' fullName='Иванов И. А.' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
@@ -145,7 +129,7 @@ class ClientsEndpointTest {
         }
         {
             Source requestPayload = new StringSource(
-                    "<updateClientRequest id='2' type='ENTITY' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
+                    "<updateClientRequest id='99' type='ENTITY' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
                             "<faultcode>SOAP-ENV:Client</faultcode>" +
@@ -157,8 +141,6 @@ class ClientsEndpointTest {
 
     @Test
     void deleteClient() {
-        Mockito.doNothing().when(service).delete(1);
-        Mockito.doThrow(new NotFoundException("Клиент")).when(service).delete(2);
         {
             Source requestPayload = new StringSource(
                     "<deleteClientRequest id='1' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
@@ -170,7 +152,7 @@ class ClientsEndpointTest {
         }
         {
             Source requestPayload = new StringSource(
-                    "<deleteClientRequest id='2' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
+                    "<deleteClientRequest id='100' xmlns = 'http://jawaprog.ru/test-task-mts'/>");
             Source responsePayload = new StringSource(
                     "<SOAP-ENV:Fault xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'>" +
                             "<faultcode>SOAP-ENV:Client</faultcode>" +
@@ -179,5 +161,5 @@ class ClientsEndpointTest {
             mockClient.sendRequest(RequestCreators.withPayload(requestPayload)).andExpect(ResponseMatchers.payload(responsePayload));
         }
     }
- */
+
 }

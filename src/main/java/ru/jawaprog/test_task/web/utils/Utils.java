@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
-import ru.jawaprog.test_task.web.rest.exceptions.InvalidParamsException;
+import ru.jawaprog.test_task.exceptions.InvalidParamsException;
 
 import java.util.Iterator;
 

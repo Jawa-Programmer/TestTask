@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.soap.exceptions;
+package ru.jawaprog.test_task.exceptions;
 
 import org.springframework.ws.soap.server.endpoint.annotation.FaultCode;
 import org.springframework.ws.soap.server.endpoint.annotation.SoapFault;

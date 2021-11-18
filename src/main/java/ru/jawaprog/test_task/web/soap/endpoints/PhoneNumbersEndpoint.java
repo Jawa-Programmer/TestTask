@@ -5,7 +5,7 @@ import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import ru.jawaprog.test_task.web.soap.services.PhoneNumbersSoapService;
+import ru.jawaprog.test_task.services.PhoneNumbersService;
 import ru.jawaprog.test_task_mts.*;
 
 import java.util.List;
@@ -14,11 +14,11 @@ import java.util.List;
 public class PhoneNumbersEndpoint {
     private static final String NAMESPACE_URI = "http://jawaprog.ru/test-task-mts";
 
-    final private PhoneNumbersSoapService service;
+    final private PhoneNumbersService service;
 
 
     @Autowired
-    public PhoneNumbersEndpoint(PhoneNumbersSoapService service) {
+    public PhoneNumbersEndpoint(PhoneNumbersService service) {
         this.service = service;
     }
 
@@ -27,31 +27,31 @@ public class PhoneNumbersEndpoint {
     @ResponsePayload
     public PhoneNumbersListResponse getPhoneNumbers() {
         PhoneNumbersListResponse response = new PhoneNumbersListResponse();
-        response.setPhoneNumber(List.copyOf(service.findAll()));
+        response.setPhoneNumber(List.copyOf(service.findAllSoap()));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getPhoneNumberRequest")
     @ResponsePayload
-    public PhoneNumberResponse getPhoneNumber(@RequestPayload GetPhoneNumberRequest request) {
+    public PhoneNumberResponse getPhoneNumber(@RequestPayload PhoneNumber request) {
         PhoneNumberResponse response = new PhoneNumberResponse();
-        response.setPhoneNumber(service.get(request.getId()));
+        response.setPhoneNumber(service.get(request));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "postPhoneNumberRequest")
     @ResponsePayload
-    public PhoneNumberResponse postPhoneNumber(@RequestPayload PostPhoneNumberRequest request) {
+    public PhoneNumberResponse postPhoneNumber(@RequestPayload PhoneNumber request) {
         PhoneNumberResponse response = new PhoneNumberResponse();
-        response.setPhoneNumber(service.saveNew(request.getNumber(), request.getAccountId()));
+        response.setPhoneNumber(service.saveNew(request));
         return response;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updatePhoneNumberRequest")
     @ResponsePayload
-    public PhoneNumberResponse updatePhoneNumber(@RequestPayload UpdatePhoneNumberRequest request) {
+    public PhoneNumberResponse updatePhoneNumber(@RequestPayload PhoneNumber request) {
         PhoneNumberResponse response = new PhoneNumberResponse();
-        response.setPhoneNumber(service.update(request.getId(), request.getNumber(), request.getAccountId()));
+        response.setPhoneNumber(service.update(request));
         return response;
     }
 

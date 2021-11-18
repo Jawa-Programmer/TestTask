@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import ru.jawaprog.test_task.web.rest.services.AccountsService;
-import ru.jawaprog.test_task.web.rest.services.ClientsService;
-import ru.jawaprog.test_task.web.rest.services.ContractsService;
-import ru.jawaprog.test_task.web.rest.services.PhoneNumbersService;
+import ru.jawaprog.test_task.services.AccountsService;
+import ru.jawaprog.test_task.services.ClientsService;
+import ru.jawaprog.test_task.services.ContractsService;
+import ru.jawaprog.test_task.services.PhoneNumbersService;
 import ru.jawaprog.test_task.web.utils.Utils;
 
 @TestConfiguration

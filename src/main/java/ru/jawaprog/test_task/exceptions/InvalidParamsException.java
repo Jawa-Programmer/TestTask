@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.exceptions;
+package ru.jawaprog.test_task.exceptions;
 
 public class InvalidParamsException extends RuntimeException {
     public InvalidParamsException(String message) {

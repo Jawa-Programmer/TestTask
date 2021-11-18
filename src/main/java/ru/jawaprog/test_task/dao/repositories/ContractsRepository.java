@@ -23,7 +23,7 @@ public interface ContractsRepository {
     @Results({
             @Result(column = "client_id", property = "clientId")
     })
-    ContractDTO insert(long number, long clientId);
+    ContractDTO insert(ContractDTO contract);
 
     @Select("<script>\n" +
             "  update contracts\n" +
@@ -36,7 +36,7 @@ public interface ContractsRepository {
     @Results({
             @Result(column = "client_id", property = "clientId")
     })
-    ContractDTO update(long id, Long number, Long clientId);
+    ContractDTO update(ContractDTO contract);
 
     @Select("SELECT * FROM contracts")
     @Results({

@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.services.mappers;
+package ru.jawaprog.test_task.services.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -41,4 +41,9 @@ public interface ContractMapper {
     }
 
     List<ru.jawaprog.test_task_mts.Contract> toSoap(List<ContractDTO> contracts);
+
+
+    ContractDTO toDto(ru.jawaprog.test_task_mts.Contract contract);
+
+    ContractDTO toDto(Contract contract);
 }

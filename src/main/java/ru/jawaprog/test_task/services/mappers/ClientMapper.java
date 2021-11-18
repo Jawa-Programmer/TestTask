@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.rest.services.mappers;
+package ru.jawaprog.test_task.services.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -31,9 +31,7 @@ public interface ClientMapper {
     @Mapping(target = "contract", expression = "java(ContractMapper.INSTANCE.fromClientId(client.getId()))")
     ru.jawaprog.test_task_mts.Client toSoap(ClientDTO client);
 
-    Collection<ru.jawaprog.test_task_mts.Client> toSoap(Collection<ClientDTO> clients);
-
-    List<ru.jawaprog.test_task_mts.Client> toSoap(Set<ClientDTO> clients);
+    List<ru.jawaprog.test_task_mts.Client> toSoap(Collection<ClientDTO> clients);
 
     @Mapping(target = "type", expression = "java(client.getType().ordinal())")
     ClientDTO toDto(Client client);
