@@ -16,6 +16,7 @@ public class PhoneNumber {
     public PhoneNumber(Long id) {
         this.id = id;
     }
+
     public PhoneNumber(String number) {
         this.number = number;
     }

@@ -36,14 +36,13 @@ public interface ClientMapper {
     @Mapping(target = "type", expression = "java(typeToDto(client.getType()))")
     ClientDTO toDto(Client client);
 
-    default Integer typeToDto(Client.ClientType type)
-    {
-        if(type == null) return null;
+    default Integer typeToDto(Client.ClientType type) {
+        if (type == null) return null;
         return type.ordinal();
     }
-    default Integer typeToDto(ClientType type)
-    {
-        if(type == null) return null;
+
+    default Integer typeToDto(ClientType type) {
+        if (type == null) return null;
         return type.ordinal();
     }
 

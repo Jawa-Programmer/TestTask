@@ -1,14 +1,10 @@
 package ru.jawaprog.test_task.web;
 
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.junit.ClassRule;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ClassPathResource;
@@ -18,7 +14,6 @@ import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.ws.test.server.MockWebServiceClient;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
 
@@ -50,12 +45,6 @@ public class TestConfig {
 
         return driver;
     }
-
-    @ClassRule
-    public static PostgreSQLContainer postgres = new PostgreSQLContainer<>("postgres")
-            .withDatabaseName("test_task_mts")
-            .withUsername("siblion")
-            .withPassword("42univers");
 
     @Bean
     public SqlSessionFactory sqlSessionFactory() throws Exception {

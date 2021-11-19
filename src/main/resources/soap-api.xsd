@@ -98,7 +98,7 @@
 
     <xs:element name="findClientsByNameRequest">
         <xs:complexType>
-            <xs:attribute name="fullName"  type="xs:string" use="required"/>
+            <xs:attribute name="fullName" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="findClientsByPhoneRequest">
