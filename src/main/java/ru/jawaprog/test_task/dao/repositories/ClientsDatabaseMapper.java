@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
-public interface ClientsRepository {
+public interface ClientsDatabaseMapper {
     @Select("SELECT * FROM clients WHERE full_name ILIKE '%'||#{name}||'%'")
     @Results({
             @Result(column = "full_name", property = "fullName")
@@ -22,6 +22,10 @@ public interface ClientsRepository {
             @Result(column = "full_name", property = "fullName")
     })
     ClientDTO findById(long id);
+
+    @Select("SELECT EXISTS(SELECT 1 FROM clients WHERE id = #{id})")
+    boolean exists(long id);
+
 
     @Select(value = "SELECT * FROM clients")
     @Results({

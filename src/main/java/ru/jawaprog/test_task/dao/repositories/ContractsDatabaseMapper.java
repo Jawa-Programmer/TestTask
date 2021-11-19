@@ -8,7 +8,7 @@ import ru.jawaprog.test_task.dao.entities.ContractDTO;
 
 import java.util.List;
 
-public interface ContractsRepository {
+public interface ContractsDatabaseMapper {
 
     @Select("SELECT * FROM contracts WHERE id = #{id}")
     @Results({
@@ -26,12 +26,12 @@ public interface ContractsRepository {
     ContractDTO insert(ContractDTO contract);
 
     @Select("<script>\n" +
-            "  update contracts\n" +
+            "  UPDATE contracts\n" +
             "    <set>\n" +
             "      <if test=\"number != null\">number=#{number},</if>\n" +
             "      <if test=\"clientId != null\">client_id=#{clientId}</if>\n" +
             "    </set>\n" +
-            "  where id=#{id} RETURNING *\n" +
+            "  where id=#{id} RETURNING *" +
             "</script>")
     @Results({
             @Result(column = "client_id", property = "clientId")
@@ -43,6 +43,9 @@ public interface ContractsRepository {
             @Result(column = "client_id", property = "clientId")
     })
     List<ContractDTO> findAll();
+
+    @Select("SELECT EXISTS(SELECT 1 FROM contracts WHERE id = #{id})")
+    boolean exists(long id);
 
     @Select("SELECT * FROM contracts WHERE client_id = #{id}")
     @Results({

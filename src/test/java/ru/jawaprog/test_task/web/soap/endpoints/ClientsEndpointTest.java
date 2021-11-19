@@ -1,10 +1,8 @@
 package ru.jawaprog.test_task.web.soap.endpoints;
 
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.core.io.ClassPathResource;
@@ -19,6 +17,7 @@ import org.springframework.ws.test.server.RequestCreators;
 import org.springframework.ws.test.server.ResponseMatchers;
 import org.springframework.xml.transform.StringSource;
 import ru.jawaprog.test_task.configuration.WebServiceConfig;
+import ru.jawaprog.test_task.web.TestConfig;
 
 import javax.sql.DataSource;
 import javax.xml.transform.Source;
@@ -35,9 +34,9 @@ class ClientsEndpointTest {
     @Autowired
     private DataSource driver;
 
-    @BeforeAll
+    @BeforeEach
     void initDatabase() {
-        Resource initSchema = new ClassPathResource("client-test.sql", getClass().getClassLoader());
+        Resource initSchema = new ClassPathResource("soap/client-test.sql", getClass().getClassLoader());
         DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
         DatabasePopulatorUtils.execute(databasePopulator, driver);
     }

@@ -13,6 +13,10 @@ public class Contract {
     public Contract() {
     }
 
+    public Contract(Long id) {
+        this.id = id;
+    }
+
     public Contract(Long id, Long number, Long clientId) {
         this.id = id;
         this.number = number;
@@ -20,8 +24,10 @@ public class Contract {
             client = new Client(clientId, null, null);
     }
 
-    public Contract(Long id) {
+    public Contract(Long id, Long number, Client client) {
         this.id = id;
+        this.number = number;
+        this.client = client;
     }
 
     @ApiModelProperty(value = "Идентификатор контракта. Первичный ключ в БД", example = "1")
@@ -32,4 +38,6 @@ public class Contract {
 
     @ApiModelProperty(value = "Клиент, с которым заключен контракт")
     Client client;
+
+
 }

@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.jawaprog.test_task.dao.entities.ContractDTO;
-import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
+import ru.jawaprog.test_task.dao.repositories.ContractsDatabaseMapper;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 
@@ -22,7 +22,7 @@ public interface ContractMapper {
     Contract toRest(ContractDTO contract);
 
     default Contract restFromId(long id) {
-        return toRest(ApplicationContextProvider.getApplicationContext().getBean(ContractsRepository.class).findById(id));
+        return toRest(ApplicationContextProvider.getApplicationContext().getBean(ContractsDatabaseMapper.class).findById(id));
     }
 
     List<Contract> toRest(List<ContractDTO> contracts);
@@ -37,7 +37,7 @@ public interface ContractMapper {
 
 
     default List<ru.jawaprog.test_task_mts.Contract> fromClientId(long id) {
-        return toSoap(ApplicationContextProvider.getApplicationContext().getBean(ContractsRepository.class).findByClientId(id));
+        return toSoap(ApplicationContextProvider.getApplicationContext().getBean(ContractsDatabaseMapper.class).findByClientId(id));
     }
 
     List<ru.jawaprog.test_task_mts.Contract> toSoap(List<ContractDTO> contracts);
@@ -45,5 +45,7 @@ public interface ContractMapper {
 
     ContractDTO toDto(ru.jawaprog.test_task_mts.Contract contract);
 
+
+    @Mapping(target = "clientId", expression = "java(contract.getClient()==null?null:contract.getClient().getId())")
     ContractDTO toDto(Contract contract);
 }

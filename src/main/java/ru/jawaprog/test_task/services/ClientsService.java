@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.ClientDTO;
 import ru.jawaprog.test_task.dao.entities.ContractDTO;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
-import ru.jawaprog.test_task.dao.repositories.ClientsRepository;
-import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
-import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
+import ru.jawaprog.test_task.dao.repositories.AccountsDatabaseMapper;
+import ru.jawaprog.test_task.dao.repositories.ClientsDatabaseMapper;
+import ru.jawaprog.test_task.dao.repositories.ContractsDatabaseMapper;
+import ru.jawaprog.test_task.dao.repositories.PhoneNumbersDatabaseMapper;
 import ru.jawaprog.test_task.exceptions.NotFoundException;
 import ru.jawaprog.test_task.services.mappers.ClientMapper;
 import ru.jawaprog.test_task.services.mappers.ContractMapper;
@@ -23,25 +23,25 @@ import java.util.List;
 @Service
 public class ClientsService {
 
-    private final ClientsRepository clientsRepository;
-    private final ContractsRepository contractsRepository;
-    private final AccountsRepository accountsRepository;
-    private final PhoneNumbersRepository phoneNumbersRepository;
+    private final ClientsDatabaseMapper clientsDatabaseMapper;
+    private final ContractsDatabaseMapper contractsDatabaseMapper;
+    private final AccountsDatabaseMapper accountsDatabaseMapper;
+    private final PhoneNumbersDatabaseMapper phoneNumbersDatabaseMapper;
 
     @Autowired
-    public ClientsService(ClientsRepository clientsRepository, ContractsRepository contractsRepository, AccountsRepository accountsRepository, PhoneNumbersRepository phoneNumbersRepository) {
-        this.clientsRepository = clientsRepository;
-        this.contractsRepository = contractsRepository;
-        this.accountsRepository = accountsRepository;
-        this.phoneNumbersRepository = phoneNumbersRepository;
+    public ClientsService(ClientsDatabaseMapper clientsDatabaseMapper, ContractsDatabaseMapper contractsDatabaseMapper, AccountsDatabaseMapper accountsDatabaseMapper, PhoneNumbersDatabaseMapper phoneNumbersDatabaseMapper) {
+        this.clientsDatabaseMapper = clientsDatabaseMapper;
+        this.contractsDatabaseMapper = contractsDatabaseMapper;
+        this.accountsDatabaseMapper = accountsDatabaseMapper;
+        this.phoneNumbersDatabaseMapper = phoneNumbersDatabaseMapper;
     }
 
     public Collection<Client> findAllRest() {
-        return ClientMapper.INSTANCE.toRest(clientsRepository.findAll());
+        return ClientMapper.INSTANCE.toRest(clientsDatabaseMapper.findAll());
     }
 
     public Client get(Client client) {
-        ClientDTO cl = clientsRepository.findById(client.getId());
+        ClientDTO cl = clientsDatabaseMapper.findById(client.getId());
         if (cl == null)
             throw new NotFoundException("Клиент");
         else
@@ -49,11 +49,11 @@ public class ClientsService {
     }
 
     public Client saveNew(Client client) {
-        return ClientMapper.INSTANCE.toRest(clientsRepository.insert(client.getFullName(), client.getType().ordinal()));
+        return ClientMapper.INSTANCE.toRest(clientsDatabaseMapper.insert(client.getFullName(), client.getType().ordinal()));
     }
 
     public Client update(Client client) {
-        ClientDTO cl = clientsRepository.update(ClientMapper.INSTANCE.toDto(client));
+        ClientDTO cl = clientsDatabaseMapper.update(ClientMapper.INSTANCE.toDto(client));
         if (cl == null)
             throw new NotFoundException("Клиент");
         else
@@ -61,28 +61,30 @@ public class ClientsService {
     }
 
     public Collection<Contract> getClientsContracts(Client client) {
-        List<ContractDTO> cl = contractsRepository.findByClientId(client.getId());
+        if (!clientsDatabaseMapper.exists(client.getId()))
+            throw new NotFoundException("Клиент");
+        List<ContractDTO> cl = contractsDatabaseMapper.findByClientId(client.getId());
         return ContractMapper.INSTANCE.toRest(cl);
     }
 
     public void delete(long id) {
-        if (clientsRepository.deleteById(id) == 0) {
+        if (clientsDatabaseMapper.deleteById(id) == 0) {
             throw new NotFoundException("Клиент");
         }
     }
 
     public Collection<Client> findByName(Client client) {
-        return ClientMapper.INSTANCE.toRest(clientsRepository.findAllByName(client.getFullName()));
+        return ClientMapper.INSTANCE.toRest(clientsDatabaseMapper.findAllByName(client.getFullName()));
     }
 
     public Collection<Client> findByPhoneNumber(PhoneNumber phoneNumber) {
-        Collection<PhoneNumberDTO> phones = phoneNumbersRepository.findAllByNumber(phoneNumber.getNumber());
+        Collection<PhoneNumberDTO> phones = phoneNumbersDatabaseMapper.findAllByNumber(phoneNumber.getNumber());
         Collection<Client> ret = new HashSet<>();
         for (PhoneNumberDTO phone : phones)
             ret.add(ClientMapper.INSTANCE.toRest(
-                    clientsRepository.findById(
-                            contractsRepository.findById(
-                                    accountsRepository.findById(
+                    clientsDatabaseMapper.findById(
+                            contractsDatabaseMapper.findById(
+                                    accountsDatabaseMapper.findById(
                                             phone.getAccountId()
                                     ).getContractId()
                             ).getClientId()
@@ -92,12 +94,12 @@ public class ClientsService {
 
 
     public List<ru.jawaprog.test_task_mts.Client> findAllSoap() {
-        return ClientMapper.INSTANCE.toSoap(clientsRepository.findAll());
+        return ClientMapper.INSTANCE.toSoap(clientsDatabaseMapper.findAll());
     }
 
 
     public ru.jawaprog.test_task_mts.Client get(long id) {
-        ClientDTO ret = clientsRepository.findById(id);
+        ClientDTO ret = clientsDatabaseMapper.findById(id);
         if (ret == null)
             throw new NotFoundException("Клиент");
         return ClientMapper.INSTANCE.toSoap(ret);
@@ -105,29 +107,29 @@ public class ClientsService {
 
 
     public ru.jawaprog.test_task_mts.Client saveNew(ru.jawaprog.test_task_mts.Client client) {
-        ClientDTO ret = clientsRepository.insert(client.getFullName(), client.getType().ordinal());
+        ClientDTO ret = clientsDatabaseMapper.insert(client.getFullName(), client.getType().ordinal());
         return ClientMapper.INSTANCE.toSoap(ret);
     }
 
     public ru.jawaprog.test_task_mts.Client update(ru.jawaprog.test_task_mts.Client client) {
-        ClientDTO ret = clientsRepository.update(ClientMapper.INSTANCE.toDto(client));
+        ClientDTO ret = clientsDatabaseMapper.update(ClientMapper.INSTANCE.toDto(client));
         if (ret == null)
             throw new NotFoundException("Клиент");
         return ClientMapper.INSTANCE.toSoap(ret);
     }
 
     public Collection<ru.jawaprog.test_task_mts.Client> findByName(ru.jawaprog.test_task_mts.Client client) {
-        return ClientMapper.INSTANCE.toSoap(clientsRepository.findAllByName(client.getFullName()));
+        return ClientMapper.INSTANCE.toSoap(clientsDatabaseMapper.findAllByName(client.getFullName()));
     }
 
     public Collection<ru.jawaprog.test_task_mts.Client> findByPhoneNumber(ru.jawaprog.test_task_mts.PhoneNumber phoneNumber) {
-        Collection<PhoneNumberDTO> phones = phoneNumbersRepository.findAllByNumber(phoneNumber.getNumber());
+        Collection<PhoneNumberDTO> phones = phoneNumbersDatabaseMapper.findAllByNumber(phoneNumber.getNumber());
         Collection<ru.jawaprog.test_task_mts.Client> ret = new HashSet<>();
         for (PhoneNumberDTO phone : phones)
             ret.add(ClientMapper.INSTANCE.toSoap(
-                    clientsRepository.findById(
-                            contractsRepository.findById(
-                                    accountsRepository.findById(phone.getAccountId()).getContractId()).getClientId()
+                    clientsDatabaseMapper.findById(
+                            contractsDatabaseMapper.findById(
+                                    accountsDatabaseMapper.findById(phone.getAccountId()).getContractId()).getClientId()
                     )));
         return ret;
     }

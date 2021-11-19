@@ -83,7 +83,7 @@ public class ClientsController {
             WebRequest request,
             @ApiParam(value = "Номер телефона", required = true) @PathVariable String number
     ) {
-        return utils.logAndSend(new ResponseEntity<>(clientsService.findByPhoneNumber(new PhoneNumber(null, number, null)), HttpStatus.OK), request);
+        return utils.logAndSend(new ResponseEntity<>(clientsService.findByPhoneNumber(new PhoneNumber(number)), HttpStatus.OK), request);
     }
 
     @ApiOperation(value = "Получить список всех клиентов")

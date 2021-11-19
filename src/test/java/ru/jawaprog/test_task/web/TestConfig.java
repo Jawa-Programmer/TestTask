@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.web.soap.endpoints;
+package ru.jawaprog.test_task.web;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.ClassRule;

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
+import ru.jawaprog.test_task.dao.repositories.PhoneNumbersDatabaseMapper;
 import ru.jawaprog.test_task.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.exceptions.NotFoundException;
 import ru.jawaprog.test_task.services.mappers.PhoneNumberMapper;
@@ -15,31 +15,31 @@ import java.util.List;
 
 @Service
 public class PhoneNumbersService {
-    final private PhoneNumbersRepository phoneNumbersRepository;
+    final private PhoneNumbersDatabaseMapper phoneNumbersDatabaseMapper;
 
     @Autowired
-    public PhoneNumbersService(PhoneNumbersRepository phoneNumbersRepository) {
-        this.phoneNumbersRepository = phoneNumbersRepository;
+    public PhoneNumbersService(PhoneNumbersDatabaseMapper phoneNumbersDatabaseMapper) {
+        this.phoneNumbersDatabaseMapper = phoneNumbersDatabaseMapper;
     }
 
     public Collection<PhoneNumber> findAllRest() {
-        List<PhoneNumberDTO> ret = phoneNumbersRepository.findAll();
+        List<PhoneNumberDTO> ret = phoneNumbersDatabaseMapper.findAll();
         return PhoneNumberMapper.INSTANCE.toRest(ret);
     }
 
     public Collection<PhoneNumber> getByNumber(PhoneNumber number) {
-        return PhoneNumberMapper.INSTANCE.toRest(phoneNumbersRepository.findAllByNumber(number.getNumber()));
+        return PhoneNumberMapper.INSTANCE.toRest(phoneNumbersDatabaseMapper.findAllByNumber(number.getNumber()));
     }
 
     public PhoneNumber get(PhoneNumber number) {
-        PhoneNumberDTO phn = phoneNumbersRepository.findById(number.getId());
+        PhoneNumberDTO phn = phoneNumbersDatabaseMapper.findById(number.getId());
         if (phn == null) throw new NotFoundException("Номер телефона");
         return PhoneNumberMapper.INSTANCE.toRest(phn);
     }
 
     public PhoneNumber saveNew(PhoneNumber num) {
         try {
-            return PhoneNumberMapper.INSTANCE.toRest(phoneNumbersRepository.insert(PhoneNumberMapper.INSTANCE.toDto(num)));
+            return PhoneNumberMapper.INSTANCE.toRest(phoneNumbersDatabaseMapper.insert(PhoneNumberMapper.INSTANCE.toDto(num)));
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ForeignKeyException("Счёт");
@@ -49,7 +49,7 @@ public class PhoneNumbersService {
 
     public PhoneNumber update(PhoneNumber number) {
         try {
-            PhoneNumberDTO phn = phoneNumbersRepository.update(PhoneNumberMapper.INSTANCE.toDto(number));
+            PhoneNumberDTO phn = phoneNumbersDatabaseMapper.update(PhoneNumberMapper.INSTANCE.toDto(number));
             if (phn == null) throw new NotFoundException("Номер телефона");
             return PhoneNumberMapper.INSTANCE.toRest(phn);
         } catch (
@@ -61,21 +61,21 @@ public class PhoneNumbersService {
     }
 
     public void delete(long id) {
-        if (phoneNumbersRepository.deleteById(id) == 0) throw new NotFoundException("Номер телефона");
+        if (phoneNumbersDatabaseMapper.deleteById(id) == 0) throw new NotFoundException("Номер телефона");
     }
 
 
     public Collection<ru.jawaprog.test_task_mts.PhoneNumber> findAllSoap() {
-        List<PhoneNumberDTO> ret = phoneNumbersRepository.findAll();
+        List<PhoneNumberDTO> ret = phoneNumbersDatabaseMapper.findAll();
         return PhoneNumberMapper.INSTANCE.toSoap(ret);
     }
 
     public Collection<ru.jawaprog.test_task_mts.PhoneNumber> getByNumber(ru.jawaprog.test_task_mts.PhoneNumber number) {
-        return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersRepository.findAllByNumber(number.getNumber()));
+        return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersDatabaseMapper.findAllByNumber(number.getNumber()));
     }
 
     public ru.jawaprog.test_task_mts.PhoneNumber get(ru.jawaprog.test_task_mts.PhoneNumber number) {
-        PhoneNumberDTO ret = phoneNumbersRepository.findById(number.getId());
+        PhoneNumberDTO ret = phoneNumbersDatabaseMapper.findById(number.getId());
         if (ret == null)
             throw new NotFoundException("Номер телефона");
 
@@ -84,7 +84,7 @@ public class PhoneNumbersService {
 
     public ru.jawaprog.test_task_mts.PhoneNumber saveNew(ru.jawaprog.test_task_mts.PhoneNumber number) {
         try {
-            return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersRepository.insert(PhoneNumberMapper.INSTANCE.toDto(number)));
+            return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersDatabaseMapper.insert(PhoneNumberMapper.INSTANCE.toDto(number)));
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ForeignKeyException("Счёт");
@@ -94,7 +94,7 @@ public class PhoneNumbersService {
 
     public ru.jawaprog.test_task_mts.PhoneNumber update(ru.jawaprog.test_task_mts.PhoneNumber number) {
         try {
-            PhoneNumberDTO ret = phoneNumbersRepository.update(PhoneNumberMapper.INSTANCE.toDto(number));
+            PhoneNumberDTO ret = phoneNumbersDatabaseMapper.update(PhoneNumberMapper.INSTANCE.toDto(number));
             if (ret == null)
                 throw new NotFoundException("Номер телефона");
             return PhoneNumberMapper.INSTANCE.toSoap(ret);

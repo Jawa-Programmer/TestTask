@@ -9,7 +9,7 @@ import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import java.util.List;
 
 
-public interface AccountsRepository {
+public interface AccountsDatabaseMapper {
     @Select("SELECT * FROM accounts")
     @Results({
             @Result(column = "contract_id", property = "contractId")
@@ -28,7 +28,7 @@ public interface AccountsRepository {
     })
     AccountDTO findById(long id);
 
-    @Select("<script>INSERT INTO accounts (number, contractId) VALUES(#{number}, #{contract_id}) RETURNING *</script>")
+    @Select("<script>INSERT INTO accounts (number, contract_id) VALUES(#{number}, #{contractId}) RETURNING *</script>")
     @Results({
             @Result(column = "contract_id", property = "contractId")
     })
@@ -46,6 +46,9 @@ public interface AccountsRepository {
             @Result(column = "contract_id", property = "contractId")
     })
     AccountDTO update(AccountDTO account);
+
+    @Select("SELECT EXISTS(SELECT 1 FROM accounts WHERE id = #{id})")
+    boolean exists(long id);
 
     @Delete("DELETE FROM accounts WHERE id = #{id}")
     int deleteById(long id);

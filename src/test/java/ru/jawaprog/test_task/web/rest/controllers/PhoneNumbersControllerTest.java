@@ -1,55 +1,82 @@
 package ru.jawaprog.test_task.web.rest.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.jawaprog.test_task.exceptions.ForeignKeyException;
+import ru.jawaprog.test_task.exceptions.InvalidParamsException;
+import ru.jawaprog.test_task.exceptions.NotFoundException;
+import ru.jawaprog.test_task.web.TestConfig;
+import ru.jawaprog.test_task.web.rest.entities.Account;
+import ru.jawaprog.test_task.web.rest.entities.Client;
+import ru.jawaprog.test_task.web.rest.entities.Contract;
+import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
+
+import javax.sql.DataSource;
+import javax.validation.ConstraintViolationException;
+import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
 @ContextConfiguration(classes = TestConfig.class)
 class PhoneNumbersControllerTest {
-/*
+
     private static final String BASE_PATH = "/phone-numbers";
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
+
     @Autowired
-    private PhoneNumbersService service;
+    private DataSource driver;
 
-    Collection<PhoneNumber> database;
-
-    @BeforeAll
-    void initial() {
-        database = new HashSet<>();
-        {
-            PhoneNumber c = new PhoneNumber(1L, "+7 (800) 555-35-35");
-            database.add(c);
-        }
-        {
-            PhoneNumber c = new PhoneNumber(2L, "+7 (999) 888-77-66");
-            database.add(c);
-        }
+    @BeforeEach
+    void initDatabase() {
+        Resource initSchema = new ClassPathResource("rest/test-data.sql", getClass().getClassLoader());
+        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+        DatabasePopulatorUtils.execute(databasePopulator, driver);
     }
 
-    @AfterAll
-    void cleanup() {
-        database.clear();
+    private static final Account account1, account2, account3;
+
+    static {
+        Client client2 = new Client(2L, "ОАО 'Общество Гигантских растений'", Client.ClientType.ENTITY);
+        Client client1 = new Client(1L, "Иванов И. И.", Client.ClientType.INDIVIDUAL);
+        Contract contract1 = new Contract(1L, 123L, client2);
+        Contract contract2 = new Contract(2L, 321L, client1);
+        account1 = new Account(1L, 42L, contract1);
+        account2 = new Account(2L, 33L, contract1);
+        account3 = new Account(3L, 21L, contract2);
     }
+
 
     @Test
     void getPhoneNumber() throws Exception {
         {
-            PhoneNumber acc = database.stream().findFirst().get();
-            Mockito.when(service.get(1)).thenReturn(acc);
             mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", 1))
                     .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(
+                            new PhoneNumber(1L, "+7 (800) 555-35-35", account2)
+                    )));
         }
         {
-            Mockito.when(service.get(anyLong())).thenThrow(NotFoundException.class);
-            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", 1))
+            mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH + "/{id}", 100))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
         }
         {
@@ -60,26 +87,27 @@ class PhoneNumbersControllerTest {
 
     @Test
     void getPhoneNumbers() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(database);
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_PATH))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(database)));
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(
+                        List.of(
+                                new PhoneNumber(1L, "+7 (800) 555-35-35", account2),
+                                new PhoneNumber(2L, "+7 (911) 111-22-33", account1),
+                                new PhoneNumber(3L, "+7 (123) 456-78-90", account2)
+                        )
+                )));
     }
 
     @Test
     void postPhoneNumber() throws Exception {
         {
-            PhoneNumber acc = database.stream().findFirst().get();
-
-            Mockito.when(service.saveNew(any(PhoneNumber.class))).thenReturn(acc);
             mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH)
                             .param("number", "+7 (888) 777-66-55")
-                            .param("accountId", "1"))
+                            .param("accountId", "3"))
                     .andExpect(MockMvcResultMatchers.status().isCreated())
-                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(new PhoneNumber(4L, "+7 (888) 777-66-55", account3))));
         }
         {
-            Mockito.when(service.saveNew(any(PhoneNumber.class))).thenThrow(ForeignKeyException.class);
             mockMvc.perform(MockMvcRequestBuilders.post(BASE_PATH, 1)
                             .param("accountId", "4")
                             .param("number", "231"))
@@ -101,21 +129,19 @@ class PhoneNumbersControllerTest {
     @Test
     void putPhoneNumber() throws Exception {
         {
-            PhoneNumber acc = database.stream().findFirst().get();
-            Mockito.when(service.update(1, null, 1L)).thenReturn(acc);
             mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
-                            .param("accountId", "1"))
+                            .param("accountId", "3"))
                     .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(acc)));
+                    .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(
+                            new PhoneNumber(1L, "+7 (800) 555-35-35", account3)
+                    )));
         }
         {
-            Mockito.when(service.update(1, null, 1L)).thenThrow(NotFoundException.class);
-            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 100)
                             .param("accountId", "1"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
 
-            Mockito.when(service.update(1, null, 2L)).thenThrow(ForeignKeyException.class);
-            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 1)
+            mockMvc.perform(MockMvcRequestBuilders.put(BASE_PATH + "/{id}", 100)
                             .param("accountId", "2"))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(ForeignKeyException.class));
 
@@ -140,18 +166,16 @@ class PhoneNumbersControllerTest {
     @Test
     void deletePhoneNumber() throws Exception {
         {
-            Mockito.doNothing().when(service).delete(1);
             mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", 1))
                     .andExpect(MockMvcResultMatchers.status().isNoContent());
         }
         {
-            Mockito.doThrow(NotFoundException.class).when(service).delete(1);
-            mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", 1))
+            mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", 100))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(NotFoundException.class));
             mockMvc.perform(MockMvcRequestBuilders.delete(BASE_PATH + "/{id}", -1))
                     .andExpect(mvcResult -> mvcResult.getResolvedException().getClass().equals(InvalidParamsException.class));
         }
     }
 
- */
+
 }

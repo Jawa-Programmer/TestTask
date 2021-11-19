@@ -16,12 +16,21 @@ public class PhoneNumber {
     public PhoneNumber(Long id) {
         this.id = id;
     }
+    public PhoneNumber(String number) {
+        this.number = number;
+    }
 
     public PhoneNumber(Long id, String number, Long accountId) {
         this.id = id;
         this.number = number;
         if (accountId != null)
             this.account = new Account(accountId);
+    }
+
+    public PhoneNumber(Long id, String number, Account account) {
+        this.id = id;
+        this.number = number;
+        this.account = account;
     }
 
     @ApiModelProperty(value = "Идентификатор номера телефона. Первичный ключ в БД", example = "1")

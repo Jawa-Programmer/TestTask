@@ -32,4 +32,9 @@ public class Account {
         if (contractId != null)
             this.contract = new Contract(contractId);
     }
+    public Account(Long id, Long number, Contract contract) {
+        this.id = id;
+        this.number = number;
+        this.contract = contract;
+    }
 }

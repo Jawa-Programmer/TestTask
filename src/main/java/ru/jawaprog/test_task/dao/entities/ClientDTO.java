@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClientDTO {
-    private long id;
+    private Long id;
     private String fullName;
-    private int type;
+    private Integer type;
 }

@@ -5,7 +5,7 @@ import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
 
 import java.util.List;
 
-public interface PhoneNumbersRepository {
+public interface PhoneNumbersDatabaseMapper {
 
     @Select("SELECT * FROM phone_numbers WHERE number = #{number}")
     @Results({
@@ -25,14 +25,14 @@ public interface PhoneNumbersRepository {
     })
     PhoneNumberDTO findById(long id);
 
-    @Insert("<script>INSERT INTO phone_numbers (number, account_id) VALUES(#{number}, #{accountId}) RETURNING *</script>")
+    @Select("<script>INSERT INTO phone_numbers (number, account_id) VALUES(#{number}, #{accountId}) RETURNING *</script>")
     @Results({
             @Result(column = "account_id", property = "accountId")
     })
-    PhoneNumberDTO insert(PhoneNumberDTO number);
+    PhoneNumberDTO insert(PhoneNumberDTO num);
 
     @Select("<script>\n" +
-            "  update accounts\n" +
+            "  UPDATE phone_numbers\n" +
             "    <set>\n" +
             "      <if test=\"number != null\">number=#{number},</if>\n" +
             "      <if test=\"accountId != null\">account_id=#{accountId}</if>\n" +
@@ -42,7 +42,7 @@ public interface PhoneNumbersRepository {
     @Results({
             @Result(column = "account_id", property = "accountId")
     })
-    PhoneNumberDTO update(PhoneNumberDTO number);
+    PhoneNumberDTO update(PhoneNumberDTO num);
 
     @Select("SELECT * FROM phone_numbers WHERE account_id = #{id}")
     @Results({

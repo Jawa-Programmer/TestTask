@@ -5,8 +5,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.jawaprog.test_task.dao.entities.AccountDTO;
 import ru.jawaprog.test_task.dao.entities.ContractDTO;
-import ru.jawaprog.test_task.dao.repositories.AccountsRepository;
-import ru.jawaprog.test_task.dao.repositories.ContractsRepository;
+import ru.jawaprog.test_task.dao.repositories.AccountsDatabaseMapper;
+import ru.jawaprog.test_task.dao.repositories.ContractsDatabaseMapper;
 import ru.jawaprog.test_task.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.exceptions.NotFoundException;
 import ru.jawaprog.test_task.services.mappers.AccountMapper;
@@ -19,21 +19,21 @@ import java.util.Collection;
 @Service
 public class ContractsService {
 
-    private final ContractsRepository contractsRepository;
-    private final AccountsRepository accountsRepository;
+    private final ContractsDatabaseMapper contractsDatabaseMapper;
+    private final AccountsDatabaseMapper accountsDatabaseMapper;
 
     @Autowired
-    public ContractsService(ContractsRepository contractsRepository, AccountsRepository accountsRepository) {
-        this.contractsRepository = contractsRepository;
-        this.accountsRepository = accountsRepository;
+    public ContractsService(ContractsDatabaseMapper contractsDatabaseMapper, AccountsDatabaseMapper accountsDatabaseMapper) {
+        this.contractsDatabaseMapper = contractsDatabaseMapper;
+        this.accountsDatabaseMapper = accountsDatabaseMapper;
     }
 
     public Collection<Contract> findAllRest() {
-        return ContractMapper.INSTANCE.toRest(contractsRepository.findAll());
+        return ContractMapper.INSTANCE.toRest(contractsDatabaseMapper.findAll());
     }
 
     public Contract get(Contract c) {
-        ContractDTO ct = contractsRepository.findById(c.getId());
+        ContractDTO ct = contractsDatabaseMapper.findById(c.getId());
         if (ct == null)
             throw new NotFoundException("Контракт");
         else
@@ -43,20 +43,20 @@ public class ContractsService {
     public Contract saveNew(Contract c) {
         try {
             return ContractMapper.INSTANCE.toRest(
-                    contractsRepository.insert(
+                    contractsDatabaseMapper.insert(
                             ContractMapper.INSTANCE.toDto(c)
                     )
             );
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
                 throw new ForeignKeyException("Клиент");
+            else throw ex;
         }
-        return null;
     }
 
     public Contract update(Contract c) {
         try {
-            ContractDTO ct = contractsRepository.update(ContractMapper.INSTANCE.toDto(c));
+            ContractDTO ct = contractsDatabaseMapper.update(ContractMapper.INSTANCE.toDto(c));
             if (ct == null)
                 throw new NotFoundException("Контракт");
             else
@@ -70,16 +70,18 @@ public class ContractsService {
 
 
     public Collection<Account> getContractsAccounts(Contract c) {
-        Collection<AccountDTO> accs = accountsRepository.findAccountsByContractId(c.getId());
+        if (!contractsDatabaseMapper.exists(c.getId()))
+            throw new NotFoundException("Контракт");
+        Collection<AccountDTO> accs = accountsDatabaseMapper.findAccountsByContractId(c.getId());
         return AccountMapper.INSTANCE.toRest(accs);
     }
 
     public Collection<ru.jawaprog.test_task_mts.Contract> findAllSoap() {
-        return ContractMapper.INSTANCE.toSoap(contractsRepository.findAll());
+        return ContractMapper.INSTANCE.toSoap(contractsDatabaseMapper.findAll());
     }
 
     public ru.jawaprog.test_task_mts.Contract get(ru.jawaprog.test_task_mts.Contract contract) {
-        ContractDTO ret = contractsRepository.findById(contract.getId());
+        ContractDTO ret = contractsDatabaseMapper.findById(contract.getId());
         if (ret == null)
             throw new NotFoundException("Контракт");
         return ContractMapper.INSTANCE.toSoap(ret);
@@ -87,7 +89,7 @@ public class ContractsService {
 
     public ru.jawaprog.test_task_mts.Contract saveNew(ru.jawaprog.test_task_mts.Contract contract) {
         try {
-            ContractDTO ret = contractsRepository.insert(ContractMapper.INSTANCE.toDto(contract));
+            ContractDTO ret = contractsDatabaseMapper.insert(ContractMapper.INSTANCE.toDto(contract));
             return ContractMapper.INSTANCE.toSoap(ret);
         } catch (DataIntegrityViolationException ex) {
             if (ex.getCause().getMessage().contains("внешнего ключа"))
@@ -98,7 +100,7 @@ public class ContractsService {
 
     public ru.jawaprog.test_task_mts.Contract update(ru.jawaprog.test_task_mts.Contract contract) {
         try {
-            ContractDTO ret = contractsRepository.update(ContractMapper.INSTANCE.toDto(contract));
+            ContractDTO ret = contractsDatabaseMapper.update(ContractMapper.INSTANCE.toDto(contract));
             if (ret == null)
                 throw new NotFoundException("Контракт");
             return ContractMapper.INSTANCE.toSoap(ret);
@@ -110,7 +112,7 @@ public class ContractsService {
     }
 
     public void delete(long id) {
-        if (contractsRepository.deleteById(id) == 0) {
+        if (contractsDatabaseMapper.deleteById(id) == 0) {
             throw new NotFoundException("Контракт");
         }
     }

@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.PhoneNumbersRepository;
+import ru.jawaprog.test_task.dao.repositories.PhoneNumbersDatabaseMapper;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 
@@ -30,11 +30,13 @@ public interface PhoneNumberMapper {
     Collection<ru.jawaprog.test_task_mts.PhoneNumber> toSoap(Collection<PhoneNumberDTO> phoneNumbers);
 
     default List<ru.jawaprog.test_task_mts.PhoneNumber> fromAccountId(long id) {
-        return toSoap(ApplicationContextProvider.getApplicationContext().getBean(PhoneNumbersRepository.class).findByAccountId(id));
+        return toSoap(ApplicationContextProvider.getApplicationContext().getBean(PhoneNumbersDatabaseMapper.class).findByAccountId(id));
     }
 
     List<ru.jawaprog.test_task_mts.PhoneNumber> toSoap(List<PhoneNumberDTO> phoneNumbers);
 
     PhoneNumberDTO toDto(ru.jawaprog.test_task_mts.PhoneNumber number);
+
+    @Mapping(target = "accountId", expression = "java(number.getAccount()==null?null:number.getAccount().getId())")
     PhoneNumberDTO toDto(PhoneNumber number);
 }

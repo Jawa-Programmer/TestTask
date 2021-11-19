@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PhoneNumberDTO {
-    private long id;
+    private Long id;
     private String number;
-    private long accountId;
+    private Long accountId;
 }

@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AccountDTO {
-    private long id;
-    private long contractId;
-    private long number;
+    private Long id;
+    private Long contractId;
+    private Long number;
 }
