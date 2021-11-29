@@ -15,7 +15,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import javax.sql.DataSource;
 
 @Configuration
-@MapperScan("ru.jawaprog.test_task.dao.repositories")
+@MapperScan("ru.jawaprog.test_task.repositories")
 public class MyBatisConfig {
     @Bean
     public DataSource dataSource() {

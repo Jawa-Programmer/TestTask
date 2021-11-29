@@ -1,4 +1,4 @@
-package ru.jawaprog.test_task.dao.entities;
+package ru.jawaprog.test_task.repositories.entities;
 
 import lombok.Getter;
 import lombok.Setter;

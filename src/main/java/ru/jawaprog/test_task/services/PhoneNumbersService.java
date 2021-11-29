@@ -1,12 +1,10 @@
 package ru.jawaprog.test_task.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.PhoneNumbersDatabaseMapper;
-import ru.jawaprog.test_task.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.exceptions.NotFoundException;
+import ru.jawaprog.test_task.repositories.dao.PhoneNumbersDatabaseMapper;
+import ru.jawaprog.test_task.repositories.entities.PhoneNumberDTO;
 import ru.jawaprog.test_task.services.mappers.PhoneNumberMapper;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
 
@@ -38,26 +36,14 @@ public class PhoneNumbersService {
     }
 
     public PhoneNumber saveNew(PhoneNumber num) {
-        try {
-            return PhoneNumberMapper.INSTANCE.toRest(phoneNumbersDatabaseMapper.insert(PhoneNumberMapper.INSTANCE.toDto(num)));
-        } catch (DataIntegrityViolationException ex) {
-            if (ex.getCause().getMessage().contains("внешнего ключа"))
-                throw new ForeignKeyException("Счёт");
-        }
-        return null;
+        return PhoneNumberMapper.INSTANCE.toRest(phoneNumbersDatabaseMapper.insert(PhoneNumberMapper.INSTANCE.toDto(num)));
     }
 
     public PhoneNumber update(PhoneNumber number) {
-        try {
-            PhoneNumberDTO phn = phoneNumbersDatabaseMapper.update(PhoneNumberMapper.INSTANCE.toDto(number));
-            if (phn == null) throw new NotFoundException("Номер телефона");
-            return PhoneNumberMapper.INSTANCE.toRest(phn);
-        } catch (
-                DataIntegrityViolationException ex) {
-            if (ex.getCause().getMessage().contains("внешнего ключа"))
-                throw new ForeignKeyException("Счёт");
-        }
-        return null;
+        PhoneNumberDTO phn = phoneNumbersDatabaseMapper.update(PhoneNumberMapper.INSTANCE.toDto(number));
+        if (phn == null) throw new NotFoundException("Номер телефона");
+        return PhoneNumberMapper.INSTANCE.toRest(phn);
+
     }
 
     public void delete(long id) {
@@ -83,26 +69,15 @@ public class PhoneNumbersService {
     }
 
     public ru.jawaprog.test_task_mts.PhoneNumber saveNew(ru.jawaprog.test_task_mts.PhoneNumber number) {
-        try {
-            return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersDatabaseMapper.insert(PhoneNumberMapper.INSTANCE.toDto(number)));
-        } catch (DataIntegrityViolationException ex) {
-            if (ex.getCause().getMessage().contains("внешнего ключа"))
-                throw new ForeignKeyException("Счёт");
-        }
-        return null;
+        return PhoneNumberMapper.INSTANCE.toSoap(phoneNumbersDatabaseMapper.insert(PhoneNumberMapper.INSTANCE.toDto(number)));
+
     }
 
     public ru.jawaprog.test_task_mts.PhoneNumber update(ru.jawaprog.test_task_mts.PhoneNumber number) {
-        try {
-            PhoneNumberDTO ret = phoneNumbersDatabaseMapper.update(PhoneNumberMapper.INSTANCE.toDto(number));
-            if (ret == null)
-                throw new NotFoundException("Номер телефона");
-            return PhoneNumberMapper.INSTANCE.toSoap(ret);
-        } catch (DataIntegrityViolationException ex) {
-            if (ex.getCause().getMessage().contains("внешнего ключа"))
-                throw new ForeignKeyException("Счёт");
-        }
-        return null;
+        PhoneNumberDTO ret = phoneNumbersDatabaseMapper.update(PhoneNumberMapper.INSTANCE.toDto(number));
+        if (ret == null)
+            throw new NotFoundException("Номер телефона");
+        return PhoneNumberMapper.INSTANCE.toSoap(ret);
     }
 
 }

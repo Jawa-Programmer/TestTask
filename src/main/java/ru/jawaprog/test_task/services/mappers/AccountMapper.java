@@ -3,8 +3,8 @@ package ru.jawaprog.test_task.services.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import ru.jawaprog.test_task.dao.entities.AccountDTO;
-import ru.jawaprog.test_task.dao.repositories.AccountsDatabaseMapper;
+import ru.jawaprog.test_task.repositories.dao.AccountsDatabaseMapper;
+import ru.jawaprog.test_task.repositories.entities.AccountDTO;
 import ru.jawaprog.test_task.web.rest.entities.Account;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 

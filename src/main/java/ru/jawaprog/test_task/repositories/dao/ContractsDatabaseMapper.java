@@ -1,10 +1,10 @@
-package ru.jawaprog.test_task.dao.repositories;
+package ru.jawaprog.test_task.repositories.dao;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
-import ru.jawaprog.test_task.dao.entities.ContractDTO;
+import ru.jawaprog.test_task.repositories.entities.ContractDTO;
 
 import java.util.List;
 

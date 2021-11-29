@@ -3,8 +3,8 @@ package ru.jawaprog.test_task.services.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import ru.jawaprog.test_task.dao.entities.ContractDTO;
-import ru.jawaprog.test_task.dao.repositories.ContractsDatabaseMapper;
+import ru.jawaprog.test_task.repositories.dao.ContractsDatabaseMapper;
+import ru.jawaprog.test_task.repositories.entities.ContractDTO;
 import ru.jawaprog.test_task.web.rest.entities.Contract;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 

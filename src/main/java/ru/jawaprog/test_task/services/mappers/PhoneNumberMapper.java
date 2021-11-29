@@ -3,8 +3,8 @@ package ru.jawaprog.test_task.services.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import ru.jawaprog.test_task.dao.entities.PhoneNumberDTO;
-import ru.jawaprog.test_task.dao.repositories.PhoneNumbersDatabaseMapper;
+import ru.jawaprog.test_task.repositories.dao.PhoneNumbersDatabaseMapper;
+import ru.jawaprog.test_task.repositories.entities.PhoneNumberDTO;
 import ru.jawaprog.test_task.web.rest.entities.PhoneNumber;
 import ru.jawaprog.test_task.web.utils.ApplicationContextProvider;
 

@@ -18,11 +18,11 @@ import org.springframework.ws.test.server.MockWebServiceClient;
 import javax.sql.DataSource;
 
 @TestConfiguration
-@MapperScan("ru.jawaprog.test_task.dao.repositories")
+@MapperScan("ru.jawaprog.test_task.repositories")
 @ComponentScan({"ru.jawaprog.test_task.web.soap.endpoints",
         "ru.jawaprog.test_task.web.rest.controllers",
         "ru.jawaprog.test_task.services",
-        "ru.jawaprog.test_task.dao.repositories",
+        "ru.jawaprog.test_task.repositories",
         "ru.jawaprog.test_task.web.utils"})
 public class TestConfig {
 
