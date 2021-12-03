@@ -36,13 +36,12 @@ class ContractsControllerTest {
 
 
     private static final String BASE_PATH = "/contracts";
-
+    private static final Client client1 = new Client(1L, "Иванов И. И.", Client.ClientType.INDIVIDUAL),
+            client2 = new Client(2L, "ОАО 'Общество Гигантских растений'", Client.ClientType.ENTITY);
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private DataSource driver;
 
@@ -52,9 +51,6 @@ class ContractsControllerTest {
         DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
         DatabasePopulatorUtils.execute(databasePopulator, driver);
     }
-
-    private static final Client client1 = new Client(1L, "Иванов И. И.", Client.ClientType.INDIVIDUAL),
-            client2 = new Client(2L, "ОАО 'Общество Гигантских растений'", Client.ClientType.ENTITY);
 
     @Test
     void getContract() throws Exception {

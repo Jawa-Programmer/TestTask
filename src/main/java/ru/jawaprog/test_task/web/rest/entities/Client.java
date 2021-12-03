@@ -9,10 +9,12 @@ import lombok.Setter;
 @Setter
 @ApiModel(description = "Описание клиента МТС")
 public class Client {
-    public enum ClientType {
-        INDIVIDUAL,
-        ENTITY
-    }
+    @ApiModelProperty(value = "Идентификатор клиента. Первичный ключ в БД", example = "1")
+    private Long id;
+    @ApiModelProperty(value = "ФИО физического лица или наименование организации", example = "ИП Иванова")
+    private String fullName;
+    @ApiModelProperty(value = "Тип клиента. INDIVIDUAL - физическое лицо, ENTITY - юридическое лицо.", example = "ENTITY")
+    private ClientType type;
 
     public Client() {
     }
@@ -27,13 +29,9 @@ public class Client {
         this.type = type;
     }
 
-    @ApiModelProperty(value = "Идентификатор клиента. Первичный ключ в БД", example = "1")
-    private Long id;
-
-    @ApiModelProperty(value = "ФИО физического лица или наименование организации", example = "ИП Иванова")
-    private String fullName;
-
-    @ApiModelProperty(value = "Тип клиента. INDIVIDUAL - физическое лицо, ENTITY - юридическое лицо.", example = "ENTITY")
-    private ClientType type;
+    public enum ClientType {
+        INDIVIDUAL,
+        ENTITY
+    }
 
 }

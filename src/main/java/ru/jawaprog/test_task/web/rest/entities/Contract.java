@@ -10,6 +10,13 @@ import lombok.Setter;
 @ApiModel(description = "Описание контракта с клиентом МТС")
 public class Contract {
 
+    @ApiModelProperty(value = "Клиент, с которым заключен контракт")
+    Client client;
+    @ApiModelProperty(value = "Идентификатор контракта. Первичный ключ в БД", example = "1")
+    private Long id;
+    @ApiModelProperty(value = "Номер контракта.", example = "111222333444")
+    private Long number;
+
     public Contract() {
     }
 
@@ -29,15 +36,6 @@ public class Contract {
         this.number = number;
         this.client = client;
     }
-
-    @ApiModelProperty(value = "Идентификатор контракта. Первичный ключ в БД", example = "1")
-    private Long id;
-
-    @ApiModelProperty(value = "Номер контракта.", example = "111222333444")
-    private Long number;
-
-    @ApiModelProperty(value = "Клиент, с которым заключен контракт")
-    Client client;
 
 
 }

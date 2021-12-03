@@ -1,269 +1,265 @@
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://jawaprog.ru/test-task-mts"
-           targetNamespace="http://jawaprog.ru/test-task-mts" elementFormDefault="qualified">
-    <!-- определение типов данных -->
-    <!--
-     В отличие от REST API, тут я решил построить иерархию в прямом порядке.
-     Теперь клиенты содержат в себе список контрактов, контракты список счетов и так далее.
-     При этом в обратную сторону связь осуществляется по внешнему ключу (для PhoneNumber это accountId, и так далее)
+<xs:schema xmlns:tns="http://jawaprog.ru/test-task-mts" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" targetNamespace="http://jawaprog.ru/test-task-mts">
+	<!-- определение типов данных -->
+	<!--
+	 В отличие от REST API, тут я решил построить иерархию в прямом порядке.
+	 Теперь клиенты содержат в себе список контрактов, контракты список счетов и так далее.
+	 При этом в обратную сторону связь осуществляется по внешнему ключу (для PhoneNumber это accountId, и так далее)
 
-     Сделано это во-первых потому что чаще нужно по имени клиента найти его номера телефонов и контрактов, а не наоборот.
-     Во-вторых, что бы потренироваться и написать то же самое чуть чуть с другой стороны)
-    -->
-    <xs:simpleType name="ClientType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="INDIVIDUAL"/>
-            <xs:enumeration value="ENTITY"/>
-        </xs:restriction>
-    </xs:simpleType>
+	 Сделано это во-первых потому что чаще нужно по имени клиента найти его номера телефонов и контрактов, а не наоборот.
+	 Во-вторых, что бы потренироваться и написать то же самое чуть чуть с другой стороны)
+	-->
+	<xs:simpleType name="ClientType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="INDIVIDUAL" />
+			<xs:enumeration value="ENTITY" />
+		</xs:restriction>
+	</xs:simpleType>
 
-    <xs:simpleType name="id">
-        <xs:restriction base="xs:long">
-            <xs:minInclusive value="1"/>
-        </xs:restriction>
-    </xs:simpleType>
+	<xs:simpleType name="id">
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="1" />
+		</xs:restriction>
+	</xs:simpleType>
 
-    <xs:simpleType name="number">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}"/>
-        </xs:restriction>
-    </xs:simpleType>
+	<xs:simpleType name="number">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}" />
+		</xs:restriction>
+	</xs:simpleType>
 
-    <xs:complexType name="Client">
-        <xs:sequence>
-            <xs:element name="contract" type="tns:Contract" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="tns:id"/>
-        <xs:attribute name="fullName" type="xs:string"/>
-        <xs:attribute name="type" type="tns:ClientType"/>
-    </xs:complexType>
+	<xs:complexType name="Client">
+		<xs:sequence>
+			<xs:element name="contract" maxOccurs="unbounded" minOccurs="0" type="tns:Contract" />
+		</xs:sequence>
+		<xs:attribute name="id" type="tns:id" />
+		<xs:attribute name="fullName" type="xs:string" />
+		<xs:attribute name="type" type="tns:ClientType" />
+	</xs:complexType>
 
-    <xs:complexType name="Contract">
-        <xs:sequence>
-            <xs:element name="account" type="tns:Account" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="tns:id"/>
-        <xs:attribute name="number" type="xs:long"/>
-        <xs:attribute name="clientId" type="xs:long"/>
-    </xs:complexType>
+	<xs:complexType name="Contract">
+		<xs:sequence>
+			<xs:element name="account" maxOccurs="unbounded" minOccurs="0" type="tns:Account" />
+		</xs:sequence>
+		<xs:attribute name="id" type="tns:id" />
+		<xs:attribute name="number" type="xs:long" />
+		<xs:attribute name="clientId" type="xs:long" />
+	</xs:complexType>
 
-    <xs:complexType name="Account">
-        <xs:sequence>
-            <xs:element name="phoneNumber" type="tns:PhoneNumber" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="id" type="tns:id"/>
-        <xs:attribute name="number" type="xs:long"/>
-        <xs:attribute name="contractId" type="xs:long"/>
-    </xs:complexType>
+	<xs:complexType name="Account">
+		<xs:sequence>
+			<xs:element name="phoneNumber" maxOccurs="unbounded" minOccurs="0" type="tns:PhoneNumber" />
+		</xs:sequence>
+		<xs:attribute name="id" type="tns:id" />
+		<xs:attribute name="number" type="xs:long" />
+		<xs:attribute name="contractId" type="xs:long" />
+	</xs:complexType>
 
-    <xs:complexType name="PhoneNumber">
-        <xs:attribute name="id" type="tns:id"/>
-        <xs:attribute name="number" type="tns:number"/>
-        <xs:attribute name="accountId" type="xs:long"/>
-    </xs:complexType>
+	<xs:complexType name="PhoneNumber">
+		<xs:attribute name="id" type="tns:id" />
+		<xs:attribute name="number" type="tns:number" />
+		<xs:attribute name="accountId" type="xs:long" />
+	</xs:complexType>
 
-    <xs:element name="StatusMessage">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="message" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="StatusMessage">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="message" type="xs:string" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <!-- секция запросов и ответов для Client -->
+	<!-- секция запросов и ответов для Client -->
 
-    <xs:element name="ClientResponse"> <!-- ответ в виде одного клиента -->
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="client" type="tns:Client"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="ClientResponse"> <!-- ответ в виде одного клиента -->
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="client" type="tns:Client" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="ClientsListResponse"> <!-- ответ в виде списка клиентов -->
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="client" type="tns:Client" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="ClientsListResponse"> <!-- ответ в виде списка клиентов -->
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="client" maxOccurs="unbounded" minOccurs="0" type="tns:Client" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="getClientsRequest">
-    </xs:element>
+	<xs:element name="getClientsRequest"></xs:element>
 
-    <xs:element name="getClientRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="getClientRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="findClientsByNameRequest">
-        <xs:complexType>
-            <xs:attribute name="fullName" type="xs:string" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="findClientsByPhoneRequest">
-        <xs:complexType>
-            <xs:attribute name="number" type="tns:number" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="findClientsByNameRequest">
+		<xs:complexType>
+			<xs:attribute name="fullName" type="xs:string" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="findClientsByPhoneRequest">
+		<xs:complexType>
+			<xs:attribute name="number" type="tns:number" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="postClientRequest">
-        <xs:complexType>
-            <xs:attribute name="fullName" type="xs:string" use="required"/>
-            <xs:attribute name="type" type="tns:ClientType" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="updateClientRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-            <xs:attribute name="fullName" type="xs:string"/>
-            <xs:attribute name="type" type="tns:ClientType"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="postClientRequest">
+		<xs:complexType>
+			<xs:attribute name="fullName" type="xs:string" use="required" />
+			<xs:attribute name="type" type="tns:ClientType" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updateClientRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+			<xs:attribute name="fullName" type="xs:string" />
+			<xs:attribute name="type" type="tns:ClientType" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="deleteClientRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="deleteClientRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <!-- секция запросов и ответов для Contract -->
+	<!-- секция запросов и ответов для Contract -->
 
-    <xs:element name="ContractResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="contract" type="tns:Contract"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="ContractResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="contract" type="tns:Contract" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="ContractsListResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="contract" type="tns:Contract" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="ContractsListResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="contract" maxOccurs="unbounded" minOccurs="0" type="tns:Contract" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="getContractsRequest">
-    </xs:element>
+	<xs:element name="getContractsRequest"></xs:element>
 
-    <xs:element name="getContractRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="getContractRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="postContractRequest">
-        <xs:complexType>
-            <xs:attribute name="number" type="xs:long" use="required"/>
-            <xs:attribute name="clientId" type="xs:long" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="updateContractRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-            <xs:attribute name="number" type="xs:long"/>
-            <xs:attribute name="clientId" type="xs:long"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="postContractRequest">
+		<xs:complexType>
+			<xs:attribute name="number" type="xs:long" use="required" />
+			<xs:attribute name="clientId" type="xs:long" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updateContractRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+			<xs:attribute name="number" type="xs:long" />
+			<xs:attribute name="clientId" type="xs:long" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="deleteContractRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="deleteContractRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <!-- секция запросов и ответов для Account -->
+	<!-- секция запросов и ответов для Account -->
 
-    <xs:element name="AccountResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="account" type="tns:Account"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="AccountResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="account" type="tns:Account" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="AccountsListResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="account" type="tns:Account" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="AccountsListResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="account" maxOccurs="unbounded" minOccurs="0" type="tns:Account" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="getAccountsRequest">
-    </xs:element>
+	<xs:element name="getAccountsRequest"></xs:element>
 
-    <xs:element name="getAccountRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="getAccountRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="postAccountRequest">
-        <xs:complexType>
-            <xs:attribute name="number" type="xs:long" use="required"/>
-            <xs:attribute name="contractId" type="xs:long" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="updateAccountRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-            <xs:attribute name="number" type="xs:long"/>
-            <xs:attribute name="contractId" type="xs:long"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="postAccountRequest">
+		<xs:complexType>
+			<xs:attribute name="number" type="xs:long" use="required" />
+			<xs:attribute name="contractId" type="xs:long" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updateAccountRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+			<xs:attribute name="number" type="xs:long" />
+			<xs:attribute name="contractId" type="xs:long" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="deleteAccountRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="deleteAccountRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <!-- секция запросов и ответов для PhoneNumber -->
+	<!-- секция запросов и ответов для PhoneNumber -->
 
-    <xs:element name="PhoneNumberResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="phoneNumber" type="tns:PhoneNumber"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="PhoneNumberResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="phoneNumber" type="tns:PhoneNumber" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="PhoneNumbersListResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="phoneNumber" type="tns:PhoneNumber" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="PhoneNumbersListResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="phoneNumber" maxOccurs="unbounded" minOccurs="0" type="tns:PhoneNumber" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="getPhoneNumbersRequest">
-    </xs:element>
+	<xs:element name="getPhoneNumbersRequest"></xs:element>
 
-    <xs:element name="getPhoneNumberRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="getPhoneNumberRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 
-    <xs:element name="postPhoneNumberRequest">
-        <xs:complexType>
-            <xs:attribute name="number" type="tns:number" use="required"/>
-            <xs:attribute name="accountId" type="xs:long" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="updatePhoneNumberRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-            <xs:attribute name="number" type="tns:number"/>
-            <xs:attribute name="accountId" type="xs:long"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="deletePhoneNumberRequest">
-        <xs:complexType>
-            <xs:attribute name="id" type="tns:id" use="required"/>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="postPhoneNumberRequest">
+		<xs:complexType>
+			<xs:attribute name="number" type="tns:number" use="required" />
+			<xs:attribute name="accountId" type="xs:long" use="required" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="updatePhoneNumberRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+			<xs:attribute name="number" type="tns:number" />
+			<xs:attribute name="accountId" type="xs:long" />
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="deletePhoneNumberRequest">
+		<xs:complexType>
+			<xs:attribute name="id" type="tns:id" use="required" />
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

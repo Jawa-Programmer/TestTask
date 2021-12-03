@@ -30,7 +30,7 @@ import java.util.List;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
 @ContextConfiguration(classes = TestConfig.class)
-class ClientsControllerTest {
+class ClientsDTOControllerTest {
 
     private static final String BASE_PATH = "/clients";
 

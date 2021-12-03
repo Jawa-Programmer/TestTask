@@ -2,9 +2,7 @@ package ru.jawaprog.test_task.services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.jawaprog.test_task.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.exceptions.NotFoundException;
 import ru.jawaprog.test_task.repositories.dao.AccountsDatabaseMapper;
 import ru.jawaprog.test_task.repositories.dao.PhoneNumbersDatabaseMapper;
@@ -40,7 +38,7 @@ public class AccountsService {
     }
 
     public Account saveNew(Account acc) {
-            return AccountMapper.INSTANCE.toRest(accountsDatabaseMapper.insert(AccountMapper.INSTANCE.toDto(acc)));
+        return AccountMapper.INSTANCE.toRest(accountsDatabaseMapper.insert(AccountMapper.INSTANCE.toDto(acc)));
     }
 
     public Account update(Account account) {

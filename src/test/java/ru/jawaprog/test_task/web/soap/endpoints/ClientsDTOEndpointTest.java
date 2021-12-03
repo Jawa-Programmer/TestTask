@@ -26,7 +26,7 @@ import javax.xml.transform.Source;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest
 @ContextConfiguration(classes = {TestConfig.class, WebServiceConfig.class})
-class ClientsEndpointTest {
+class ClientsDTOEndpointTest {
 
     @Autowired
     private MockWebServiceClient mockClient;

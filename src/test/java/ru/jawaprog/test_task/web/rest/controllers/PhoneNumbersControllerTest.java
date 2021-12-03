@@ -36,23 +36,6 @@ import java.util.List;
 class PhoneNumbersControllerTest {
 
     private static final String BASE_PATH = "/phone-numbers";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private DataSource driver;
-
-    @BeforeEach
-    void initDatabase() {
-        Resource initSchema = new ClassPathResource("rest/test-data.sql", getClass().getClassLoader());
-        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
-        DatabasePopulatorUtils.execute(databasePopulator, driver);
-    }
-
     private static final Account account1, account2, account3;
 
     static {
@@ -65,6 +48,19 @@ class PhoneNumbersControllerTest {
         account3 = new Account(3L, 21L, contract2);
     }
 
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private DataSource driver;
+
+    @BeforeEach
+    void initDatabase() {
+        Resource initSchema = new ClassPathResource("rest/test-data.sql", getClass().getClassLoader());
+        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+        DatabasePopulatorUtils.execute(databasePopulator, driver);
+    }
 
     @Test
     void getPhoneNumber() throws Exception {

@@ -10,6 +10,13 @@ import lombok.Setter;
 @ApiModel(description = "Описание номера телефона в сети МТС")
 public class PhoneNumber {
 
+    @ApiModelProperty(value = "Идентификатор номера телефона. Первичный ключ в БД", example = "1")
+    private Long id;
+    @ApiModelProperty(value = "Номер телефона в формате +7 (xxx) xxx-xx-xx", example = "+7 (800) 555-35-35")
+    private String number;
+    @ApiModelProperty(value = "Лицевой счёт, на котором хранится баланс телефона.")
+    private Account account;
+
     public PhoneNumber() {
     }
 
@@ -33,13 +40,4 @@ public class PhoneNumber {
         this.number = number;
         this.account = account;
     }
-
-    @ApiModelProperty(value = "Идентификатор номера телефона. Первичный ключ в БД", example = "1")
-    private Long id;
-
-    @ApiModelProperty(value = "Номер телефона в формате +7 (xxx) xxx-xx-xx", example = "+7 (800) 555-35-35")
-    private String number;
-
-    @ApiModelProperty(value = "Лицевой счёт, на котором хранится баланс телефона.")
-    private Account account;
 }

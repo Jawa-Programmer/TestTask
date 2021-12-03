@@ -36,24 +36,6 @@ import java.util.List;
 class AccountControllerTest {
 
     private static final String BASE_PATH = "/accounts";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private DataSource driver;
-
-    @BeforeEach
-    void initDatabase() {
-        Resource initSchema = new ClassPathResource("rest/test-data.sql", getClass().getClassLoader());
-        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
-        DatabasePopulatorUtils.execute(databasePopulator, driver);
-    }
-
-
     private static final Contract contract1;
     private static final Contract contract2;
     private static final Contract contract3;
@@ -66,6 +48,19 @@ class AccountControllerTest {
         contract3 = new Contract(3L, 666L, client1);
     }
 
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private DataSource driver;
+
+    @BeforeEach
+    void initDatabase() {
+        Resource initSchema = new ClassPathResource("rest/test-data.sql", getClass().getClassLoader());
+        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+        DatabasePopulatorUtils.execute(databasePopulator, driver);
+    }
 
     @Test
     void getAccount() throws Exception {

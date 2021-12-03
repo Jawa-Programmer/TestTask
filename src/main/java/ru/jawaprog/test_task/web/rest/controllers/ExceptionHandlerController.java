@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import ru.jawaprog.test_task.exceptions.DataBaseException;
 import ru.jawaprog.test_task.exceptions.ForeignKeyException;
 import ru.jawaprog.test_task.exceptions.InvalidParamsException;
 import ru.jawaprog.test_task.exceptions.NotFoundException;
@@ -21,23 +22,11 @@ import ru.jawaprog.test_task.web.utils.Utils;
 @Log4j2
 @ControllerAdvice
 public class ExceptionHandlerController {
+    private final Utils utils;
+
     @Autowired
-    private Utils utils;
-
-    private enum EntityType {
-        CLIENT("Клиент"), CONTRACT("Контракт"), ACCOUNT("Лицевой счёт"), PHONE_NUMBER("Номер Телефона");
-        final String name;
-
-        EntityType(String nm) {
-            name = nm;
-        }
-
-        public static EntityType fromClass(Class cls) {
-            if (cls == Client.class) return CLIENT;
-            else if (cls == Contract.class) return CONTRACT;
-            else if (cls == Account.class) return ACCOUNT;
-            else return PHONE_NUMBER;
-        }
+    public ExceptionHandlerController(Utils utils) {
+        this.utils = utils;
     }
 
     @ExceptionHandler(value = {NotFoundException.class})
@@ -78,6 +67,15 @@ public class ExceptionHandlerController {
         ), request);
     }
 
+    @ExceptionHandler(value = {DataBaseException.class})
+    protected ResponseEntity<ErrorInfo> handleConflict(DataBaseException exception, WebRequest request) {
+        log.catching(exception);
+        return utils.logAndSend(new ResponseEntity<>(new ErrorInfo(500,
+                "Ошибка обращения к базе данных"),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        ), request);
+    }
+
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<ErrorInfo> handleConflict(Exception exception, WebRequest request) {
         log.catching(exception);
@@ -85,5 +83,21 @@ public class ExceptionHandlerController {
                 "Внутренняя ошибка сервера"),
                 HttpStatus.INTERNAL_SERVER_ERROR
         ), request);
+    }
+
+    private enum EntityType {
+        CLIENT("Клиент"), CONTRACT("Контракт"), ACCOUNT("Лицевой счёт"), PHONE_NUMBER("Номер Телефона");
+        final String name;
+
+        EntityType(String nm) {
+            name = nm;
+        }
+
+        public static EntityType fromClass(Class cls) {
+            if (cls == Client.class) return CLIENT;
+            else if (cls == Contract.class) return CONTRACT;
+            else if (cls == Account.class) return ACCOUNT;
+            else return PHONE_NUMBER;
+        }
     }
 }

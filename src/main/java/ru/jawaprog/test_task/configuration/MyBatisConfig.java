@@ -25,9 +25,16 @@ public class MyBatisConfig {
         driver.setUsername("siblion");
         driver.setPassword("42univers");
 
-        Resource initSchema = new ClassPathResource("schema.sql");
-        DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
-        DatabasePopulatorUtils.execute(databasePopulator, driver);
+        {
+            Resource initSchema = new ClassPathResource("schema.sql");
+            DatabasePopulator databasePopulator = new ResourceDatabasePopulator(initSchema);
+            DatabasePopulatorUtils.execute(databasePopulator, driver);
+        }
+        {
+            Resource testData = new ClassPathResource("test-data.sql");
+            DatabasePopulator databasePopulator = new ResourceDatabasePopulator(testData);
+            DatabasePopulatorUtils.execute(databasePopulator, driver);
+        }
 
         return driver;
     }
